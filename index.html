@@ -231,14 +231,23 @@ function cls(p)   { return p>=100?'r':p>=70?'y':'g'; }
 
 function calcDay(row) {
   var now = new Date(); now.setHours(0,0,0,0);
+
+  // 1) Если есть "дата начала выполнения" — она главнее
   if (row.ds) {
     var d = new Date(row.ds); d.setHours(0,0,0,0);
     return d < now ? now : d;
   }
+
+  // 2) Иначе по дате доставки:
+  //    - если доставка в Пн => нагрузка на Сб (минус 2 дня)
+  //    - иначе => минус 1 день (как было)
   if (row.dd) {
-    var d2 = addDays(row.dd, -1); d2.setHours(0,0,0,0);
+    var dd = new Date(row.dd); dd.setHours(0,0,0,0);
+    var offset = (dd.getDay() === 1) ? -2 : -1; // 1 = Понедельник
+    var d2 = addDays(dd, offset); d2.setHours(0,0,0,0);
     return d2 < now ? now : d2;
   }
+
   return null;
 }
 
