@@ -13,7 +13,6 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
 .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#00e676;margin-right:4px;animation:pulse 2s infinite}
 .dot.err{background:#ff3d57;animation:none}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
-
 .settings{background:#161920;border-bottom:1px solid #252830;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .stitle{font-size:11px;color:#4fc3f7;font-weight:700}
 .settings label{font-size:11px;color:#6b7280;display:flex;align-items:center;gap:5px}
@@ -21,17 +20,14 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
 .settings input:focus{outline:none;border-color:#4fc3f7}
 .rbtn{padding:6px 14px;background:#4fc3f7;color:#000;border:none;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer}
 .rbtn:active{opacity:0.8}
-
 .main{padding:12px 16px}
 .summary{display:flex;gap:8px;margin-bottom:14px}
 .si{flex:1;background:#161920;border:1px solid #252830;border-radius:6px;padding:8px;text-align:center}
 .sn{font-size:20px;font-weight:900;line-height:1}
 .sd{font-size:9px;color:#6b7280;margin-top:2px;line-height:1.3}
-
 .toggle{display:flex;gap:6px;margin-bottom:12px}
 .tb{flex:1;padding:8px;border:1px solid #252830;background:transparent;color:#6b7280;font-size:11px;font-weight:700;border-radius:5px;cursor:pointer}
 .tb.on{background:#4fc3f7;color:#000;border-color:#4fc3f7}
-
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px}
 .card{background:#161920;border-radius:7px;padding:13px;cursor:pointer;border:1px solid #252830;transition:transform 0.1s}
 .card:active{transform:scale(0.97)}
@@ -54,7 +50,6 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
 .fn{display:flex;gap:10px}
 .fi-n{font-size:13px;font-weight:700;color:#00e676}
 .fi-s{font-size:9px;color:#6b7280}
-
 .chart-box{background:#161920;border:1px solid #252830;border-radius:7px;padding:14px}
 .chart-hdr{font-size:11px;font-weight:700;color:#6b7280;letter-spacing:1px;margin-bottom:14px;text-transform:uppercase}
 .chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -67,13 +62,9 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
 .legend{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
 .li{display:flex;align-items:center;gap:5px;font-size:10px;color:#6b7280}
 .ld{width:9px;height:9px;border-radius:2px}
-
-/* OVERLAY BASE */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:99;align-items:flex-end;justify-content:center}
 .overlay.on{display:flex}
-.modal{background:#161920;border-radius:12px 12px 0 0;padding:20px;width:100%;max-height:88vh;overflow-y:auto;position:relative}
-
-/* DAY MODAL */
+.modal{background:#161920;border-radius:12px 12px 0 0;padding:20px;width:100%;max-height:88vh;overflow-y:auto}
 .mh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
 .mdate{font-size:24px;font-weight:900}
 .mclose{background:none;border:none;color:#6b7280;font-size:22px;cursor:pointer;padding:4px}
@@ -94,21 +85,16 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
 .fcl{font-size:9px;color:#6b7280;margin-bottom:3px}
 .fcv{font-size:17px;font-weight:900;color:#00e676}
 .fcs{font-size:9px;color:#6b7280;margin-top:1px}
-
-/* TASKS TABLE */
 .tasks-table{width:100%;border-collapse:collapse;font-size:12px}
 .tasks-table th{text-align:left;font-size:9px;color:#6b7280;font-weight:600;padding:6px 8px;border-bottom:1px solid #252830;white-space:nowrap}
 .tasks-table td{padding:8px;border-bottom:1px solid #1a1d24;vertical-align:middle}
 .tasks-table tr:last-child td{border-bottom:none}
-.tasks-table tr.task-clickable{cursor:pointer}
-.tasks-table tr.task-clickable:hover td{background:#1d2028}
+.tasks-table tr.tr-click{cursor:pointer}
+.tasks-table tr.tr-click:hover td{background:#1d2028}
 .task-num-cell{font-weight:700;color:#4fc3f7;white-space:nowrap}
 .client-cell{color:#a78bfa;font-size:11px}
 .date-cell{color:#6b7280;font-size:11px;white-space:nowrap}
 .open-btn{background:#252830;border:none;color:#4fc3f7;font-size:10px;padding:4px 8px;border-radius:3px;cursor:pointer;white-space:nowrap}
-.open-btn:active{opacity:0.7}
-
-/* TASK DETAIL MODAL (second level) */
 .overlay2{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:199;align-items:flex-end;justify-content:center}
 .overlay2.on{display:flex}
 .modal2{background:#161920;border-radius:12px 12px 0 0;padding:20px;width:100%;max-height:90vh;overflow-y:auto}
@@ -123,14 +109,11 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
 .name-cell{color:#c4c9d4;font-size:11px}
 .qty-cell{color:#00e676;font-weight:700;text-align:right;white-space:nowrap}
 .comp-summary{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
-.cs-item{background:#0d0f14;border-radius:4px;padding:7px 12px;font-size:11px}
+.cs-item{background:#0d0f14;border-radius:4px;padding:7px 12px}
 .cs-num{font-size:16px;font-weight:900;color:#e8eaf0}
 .cs-label{font-size:9px;color:#6b7280;margin-top:1px}
-
 .loading{text-align:center;padding:40px 16px;color:#6b7280;font-size:13px}
 .err-box{background:#1a0f10;border:1px solid #ff3d57;border-radius:6px;padding:14px;font-size:12px;color:#ff8a80;line-height:1.7}
-.spin{display:inline-block;animation:spin 1s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -160,14 +143,12 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
     <div class="si"><div class="sn" style="color:#ff3d57" id="s-over">—</div><div class="sd">перегруз</div></div>
     <div class="si"><div class="sn" style="color:#00e676" id="s-free">—</div><div class="sd">есть место</div></div>
   </div>
-
   <div class="toggle">
     <button class="tb on" id="btn-cards" onclick="setView('cards')">КАРТОЧКИ</button>
     <button class="tb" id="btn-chart" onclick="setView('chart')">ГРАФИК</button>
   </div>
-
   <div id="view-cards">
-    <div id="loading" class="loading"><span class="spin">⏳</span> Загружаем данные...</div>
+    <div id="loading" class="loading">⏳ Загружаем данные...</div>
     <div class="grid" id="grid"></div>
   </div>
   <div id="view-chart" style="display:none">
@@ -193,18 +174,16 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
 
 <!-- DAY MODAL -->
 <div class="overlay" id="overlay" onclick="closeDayMod(event)">
-  <div class="modal" id="day-modal">
+  <div class="modal">
     <div class="mh">
       <div><div class="mdate" id="md"></div><div style="font-size:10px;color:#6b7280" id="mdow"></div></div>
       <button class="mclose" onclick="document.getElementById('overlay').classList.remove('on')">✕</button>
     </div>
-
     <div class="msec">
       <div class="msect">Загрузка смены</div>
       <div class="mrow"><div class="mrlabel">По наименованиям</div><div class="mrbar"><div class="mrfill" id="mbn"></div></div><div class="mrpct" id="mpn"></div></div>
       <div class="mrow"><div class="mrlabel">По товарам</div><div class="mrbar"><div class="mrfill" id="mbg" style="background:#7c4dff"></div></div><div class="mrpct" id="mpg" style="color:#7c4dff"></div></div>
     </div>
-
     <div class="msec">
       <div class="msect">Показатели</div>
       <div class="mmetrics">
@@ -214,7 +193,6 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
         <div class="mm"><div class="mml">Товаров (шт)</div><div class="mmv" id="mg"></div><div class="mms">из <span id="mgn"></span> норма</div></div>
       </div>
     </div>
-
     <div class="msec">
       <div class="msect">Свободная ёмкость</div>
       <div class="fgrid">
@@ -222,9 +200,8 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
         <div class="fc"><div class="fcl">Товара ещё влезет</div><div class="fcv" id="mfg"></div><div class="fcs">шт до нормы</div></div>
       </div>
     </div>
-
     <div class="msec">
-      <div class="msect">Задания — нажмите чтобы открыть состав</div>
+      <div class="msect">Задания — нажмите для просмотра состава</div>
       <div style="overflow-x:auto">
         <table class="tasks-table">
           <thead>
@@ -267,19 +244,19 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
         <tbody id="t2-body"></tbody>
       </table>
     </div>
-    <div id="t2-loading" class="loading" style="display:none"><span class="spin">⏳</span> Загружаем состав...</div>
   </div>
 </div>
 
 <script>
-var SHEET_ID  = '1EiQUyv_4wDPW0zjeq3z39DB_CTDcR4sR6T48RFrXviY';
-var GID_MAIN  = '1755493785'; // Свод по заданиям
-var GID_COMP  = '837445101';  // Состав заданий
+var SHEET_ID = '1EiQUyv_4wDPW0zjeq3z39DB_CTDcR4sR6T48RFrXviY';
+var GID_MAIN = '1755493785'; // Свод по заданиям: A=№, B=наим, C=кол, D=дата отгр, E=дата нач сборки, F=дата окн сборки
+var GID_COMP = '837445101';  // Состав: A=№, B=артикул, C=наим, D=кол, E=клиент
 var NORM_N = 80;
 var NORM_G = 250;
 
-var rawRows  = [];
-var compRows = [];
+var rawRows  = []; // из Свода
+var compRows = []; // из Состава
+var clientMap = {}; // num -> client (из Состава)
 var dayMap   = {};
 
 function parseDate(s){
@@ -292,7 +269,7 @@ function parseDate(s){
   var d=new Date(s); return isNaN(d)?null:(d.setHours(0,0,0,0),d);
 }
 function dkey(d){return('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+d.getFullYear();}
-function dfmt(d){if(!d) return '—'; return('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+(d.getFullYear());}
+function dfmt(d){if(!d)return '—';return('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+d.getFullYear();}
 function addDays(d,n){var r=new Date(d);r.setDate(r.getDate()+n);return r;}
 function dow(d){return['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][d.getDay()];}
 function getStaff(d){
@@ -321,12 +298,13 @@ function parseCSV(txt){
       if(ch==='"'){inq=!inq;}else if(ch===','&&!inq){cols.push(cur);cur='';}else cur+=ch;
     }
     cols.push(cur);
-    rows.push(cols.map(function(c){return c.trim();}));
+    rows.push(cols.map(function(c){return(c||'').trim();}));
   }
   return rows;
 }
 
 function processMain(txt){
+  // Свод по заданиям: A=№задания B=наим C=кол D=датаОтгрузки E=датаНачСборки F=датаОкнСборки
   var rows=parseCSV(txt);
   rawRows=[];
   rows.forEach(function(c){
@@ -335,31 +313,37 @@ function processMain(txt){
     var goods=parseInt(c[2])||0;
     var dd=parseDate(c[3]);
     var ds=parseDate(c[4]);
-    var client=c[5]||'';
     if(!dd||!num) return;
-    rawRows.push({num:num,names:names,goods:goods,dd:dd,ds:ds,client:client});
+    rawRows.push({num:num,names:names,goods:goods,dd:dd,ds:ds});
   });
 }
 
 function processComp(txt){
+  // Состав заданий: A=№задания B=артикул C=наим D=кол E=клиент
   var rows=parseCSV(txt);
   compRows=[];
+  clientMap={};
   rows.forEach(function(c){
     var num=c[0];
     var art=c[1];
     var name=c[2];
     var qty=parseInt(c[3])||0;
+    var client=c[4]||'';
     if(!num||!art) return;
-    compRows.push({num:num,art:art,name:name,qty:qty});
+    compRows.push({num:num,art:art,name:name,qty:qty,client:client});
+    // Берём клиента из первой строки задания
+    if(!clientMap[num] && client) clientMap[num]=client;
   });
 }
 
 function buildDayMap(){
   dayMap={};
   rawRows.forEach(function(r){
-    var ld=calcDay(r);if(!ld) return;
+    var ld=calcDay(r);if(!ld)return;
     var k=dkey(ld);
     if(!dayMap[k]) dayMap[k]={date:ld,key:k,tasks:[],names:0,goods:0};
+    // Добавляем клиента из clientMap
+    r.client=clientMap[r.num]||'';
     dayMap[k].tasks.push(r);
     dayMap[k].names+=r.names;
     dayMap[k].goods+=r.goods;
@@ -429,7 +413,7 @@ function buildChart(days){
 }
 
 function openDayMod(key){
-  var d=dayMap[key];if(!d) return;
+  var d=dayMap[key];if(!d)return;
   var s=getStaff(d.date),nN=s*NORM_N,nG=s*NORM_G;
   var pn=Math.round(d.names/nN*100),pg=Math.round(d.goods/nG*100);
   var fN=Math.max(0,nN-d.names),fG=Math.max(0,nG-d.goods);
@@ -453,37 +437,33 @@ function openDayMod(key){
   document.getElementById('mpg').textContent=pg+'%';
   document.getElementById('mbg').style.width=Math.min(pg,100)+'%';
 
-  // Tasks table
   var th='';
   d.tasks.forEach(function(t){
-    var delStr=dfmt(t.dd);
-    th+='<tr class="task-clickable" onclick="openTaskMod(\''+t.num+'\',\''+t.client+'\')">';
+    var cl=t.client||clientMap[t.num]||'—';
+    th+='<tr class="tr-click" onclick="openTaskMod(\''+t.num+'\')">';
     th+='<td class="task-num-cell">'+t.num+'</td>';
-    th+='<td class="client-cell">'+t.client+'</td>';
+    th+='<td class="client-cell">'+cl+'</td>';
     th+='<td style="text-align:center;font-weight:700">'+t.names+'</td>';
     th+='<td style="text-align:center;font-weight:700">'+t.goods+'</td>';
-    th+='<td class="date-cell">'+delStr+'</td>';
-    th+='<td><button class="open-btn" onclick="event.stopPropagation();openTaskMod(\''+t.num+'\',\''+t.client+'\')">Состав →</button></td>';
+    th+='<td class="date-cell">'+dfmt(t.dd)+'</td>';
+    th+='<td><button class="open-btn" onclick="event.stopPropagation();openTaskMod(\''+t.num+'\')">Состав →</button></td>';
     th+='</tr>';
   });
   document.getElementById('m-tasks-body').innerHTML=th;
   document.getElementById('overlay').classList.add('on');
 }
 
-function openTaskMod(num, client){
-  document.getElementById('t2-num').textContent='Задание № '+num;
-  document.getElementById('t2-sub').textContent=(client||'')+' · состав заказа';
-  document.getElementById('t2-body').innerHTML='';
-  document.getElementById('t2-loading').style.display='block';
-  document.getElementById('overlay2').classList.add('on');
-
-  // Filter composition from loaded data
+function openTaskMod(num){
   var items=compRows.filter(function(r){return r.num===num;});
-  document.getElementById('t2-loading').style.display='none';
+  var client=clientMap[num]||'';
+
+  document.getElementById('t2-num').textContent='Задание № '+num;
+  document.getElementById('t2-sub').textContent=(client?client+' · ':'')+'состав заказа';
 
   if(items.length===0){
-    document.getElementById('t2-body').innerHTML='<tr><td colspan="3" style="padding:16px;color:#6b7280;text-align:center">Состав не найден</td></tr>';
     document.getElementById('t2-summary').innerHTML='';
+    document.getElementById('t2-body').innerHTML='<tr><td colspan="3" style="padding:16px;color:#6b7280;text-align:center">Состав не найден</td></tr>';
+    document.getElementById('overlay2').classList.add('on');
     return;
   }
 
@@ -492,8 +472,8 @@ function openTaskMod(num, client){
 
   document.getElementById('t2-summary').innerHTML=
     '<div class="cs-item"><div class="cs-num">'+items.length+'</div><div class="cs-label">артикулов</div></div>'+
-    '<div class="cs-item"><div class="cs-num">'+totalQty+'</div><div class="cs-label">товаров всего</div></div>'+
-    '<div class="cs-item" style="flex:1"><div class="cs-num" style="font-size:12px;color:#4fc3f7">'+client+'</div><div class="cs-label">клиент</div></div>';
+    '<div class="cs-item"><div class="cs-num">'+totalQty+'</div><div class="cs-label">товаров</div></div>'+
+    (client?'<div class="cs-item"><div class="cs-num" style="font-size:13px;color:#a78bfa">'+client+'</div><div class="cs-label">клиент</div></div>':'');
 
   var rows='';
   items.forEach(function(it){
@@ -504,37 +484,32 @@ function openTaskMod(num, client){
     rows+='</tr>';
   });
   document.getElementById('t2-body').innerHTML=rows;
+  document.getElementById('overlay2').classList.add('on');
 }
 
 function closeDayMod(e){if(e.target.id==='overlay')document.getElementById('overlay').classList.remove('on');}
 function closeTaskMod(e){if(e.target.id==='overlay2')document.getElementById('overlay2').classList.remove('on');}
-
 function setView(v){
   document.getElementById('view-cards').style.display=v==='cards'?'':'none';
   document.getElementById('view-chart').style.display=v==='chart'?'':'none';
   document.getElementById('btn-cards').className='tb'+(v==='cards'?' on':'');
   document.getElementById('btn-chart').className='tb'+(v==='chart'?' on':'');
 }
-
-function recalc(){ buildDayMap(); render(); }
+function recalc(){buildDayMap();render();}
 
 function fetchCSV(gid){
   var url='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/export?format=csv&gid='+gid;
-  return fetch(url).then(function(r){
-    if(!r.ok) throw new Error('Ошибка '+r.status);
-    return r.text();
-  });
+  return fetch(url).then(function(r){if(!r.ok)throw new Error('Ошибка '+r.status);return r.text();});
 }
 
 function loadData(){
   document.getElementById('loading').style.display='block';
   document.getElementById('grid').innerHTML='';
-
-  Promise.all([fetchCSV(GID_MAIN), fetchCSV(GID_COMP)])
-    .then(function(results){
+  Promise.all([fetchCSV(GID_MAIN),fetchCSV(GID_COMP)])
+    .then(function(res){
       document.getElementById('loading').style.display='none';
-      processMain(results[0]);
-      processComp(results[1]);
+      processMain(res[0]);
+      processComp(res[1]);
       buildDayMap();
       render();
       var n=new Date();
@@ -542,13 +517,13 @@ function loadData(){
       document.getElementById('dot').className='dot';
     })
     .catch(function(e){
-      document.getElementById('loading').innerHTML='<div class="err-box">⚠️ Не удалось загрузить данные.<br>'+e.message+'<br><br>Убедитесь что таблица открыта:<br><b>Файл → Настройки доступа → Все у кого есть ссылка → Читатель</b></div>';
+      document.getElementById('loading').innerHTML='<div class="err-box">⚠️ Не удалось загрузить данные.<br>'+e.message+'<br><br>Откройте доступ к таблице:<br><b>Файл → Настройки доступа → Все у кого есть ссылка → Читатель</b></div>';
       document.getElementById('dot').className='dot err';
     });
 }
 
 loadData();
-setInterval(loadData, 60*60*1000);
+setInterval(loadData,60*60*1000);
 </script>
 </body>
 </html>
