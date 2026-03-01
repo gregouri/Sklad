@@ -190,7 +190,7 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
         <div class="mm"><div class="mml">Кладовщиков</div><div class="mmv" id="ms"></div><div class="mms">на смене</div></div>
         <div class="mm"><div class="mml">Заданий</div><div class="mmv" id="mt"></div><div class="mms">на отгрузку</div></div>
         <div class="mm"><div class="mml">Наименований</div><div class="mmv" id="mn"></div><div class="mms">из <span id="mnn"></span> норма</div></div>
-        <div class="mm"><div class="mml">Товаров (шт)</div><div class="mmv" id="mg"></div><div class="mms">из <span id="mgn"></span> норма</div></div>
+        <div class="mm"><div class="mml">Количество (шт)</div><div class="mmv" id="mg"></div><div class="mms">из <span id="mgn"></span> норма</div></div>
       </div>
     </div>
     <div class="msec">
@@ -209,7 +209,7 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
               <th>№ задания</th>
               <th>Клиент</th>
               <th>Артикулов</th>
-              <th>Товаров</th>
+              <th>Количество</th>
               <th>Дата доставки</th>
               <th></th>
             </tr>
@@ -388,7 +388,7 @@ function buildCards(days){
     html+='<div class="mr"><span class="ml">По товарам</span><span class="mv">'+pg+'%</span></div>';
     html+='<div class="free"><div class="fl">Свободно до нормы</div>';
     html+='<div class="fn"><div class="fi"><div class="fi-n">'+fN+'</div><div class="fi-s">наим.</div></div>';
-    html+='<div class="fi"><div class="fi-n">'+fG+'</div><div class="fi-s">товаров</div></div></div></div></div>';
+    html+='<div class="fi"><div class="fi-n">'+fG+'</div><div class="fi-s">кол-во</div></div></div></div></div>';
   });
   document.getElementById('grid').innerHTML=html;
 }
@@ -472,7 +472,7 @@ function openTaskMod(num){
 
   document.getElementById('t2-summary').innerHTML=
     '<div class="cs-item"><div class="cs-num">'+items.length+'</div><div class="cs-label">артикулов</div></div>'+
-    '<div class="cs-item"><div class="cs-num">'+totalQty+'</div><div class="cs-label">товаров</div></div>'+
+    '<div class="cs-item"><div class="cs-num">'+totalQty+'</div><div class="cs-label">количество</div></div>'+
     (client?'<div class="cs-item"><div class="cs-num" style="font-size:13px;color:#a78bfa">'+client+'</div><div class="cs-label">клиент</div></div>':'');
 
   var rows='';
