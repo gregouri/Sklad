@@ -336,9 +336,29 @@ function color(p){return p>=100?'#ff3d57':p>=70?'#ffea00':'#00e676';}
 function cls(p){return p>=100?'r':p>=70?'y':'g';}
 
 function calcDay(row){
-  var now=new Date();now.setHours(0,0,0,0);
-  if(row.ds){var d=new Date(row.ds);d.setHours(0,0,0,0);return d<now?now:d;}
-  if(row.dd){var d2=addDays(row.dd,-1);d2.setHours(0,0,0,0);return d2<now?now:d2;}
+  var now = new Date(); now.setHours(0,0,0,0);
+
+  // 1) Если есть "Дата начала сборки" (row.ds) — берем её
+  //    но если она в прошлом → считаем как сегодня
+  if(row.ds){
+    var d = new Date(row.ds); d.setHours(0,0,0,0);
+    return d < now ? now : d;
+  }
+
+  // 2) Иначе берем "Дату доставки" (row.dd)
+  //    обычно: доставка - 1 день
+  //    НОВОЕ: если доставка в ПОНЕДЕЛЬНИК → нагрузка в ПЯТНИЦУ (доставка - 3 дня)
+  if(row.dd){
+    var isMonday = row.dd.getDay() === 1; // 1 = Пн (0=Вс, 6=Сб)
+    var offset = isMonday ? -3 : -1;
+
+    var d2 = addDays(row.dd, offset);
+    d2.setHours(0,0,0,0);
+
+    // просрочка → на сегодня
+    return d2 < now ? now : d2;
+  }
+
   return null;
 }
 
