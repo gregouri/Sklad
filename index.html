@@ -126,26 +126,21 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
 .loading, #upd-time {
   color: var(--muted) !important;
 }
-  /* === Увеличиваем мелкий шрифт по всему интерфейсу === */
+
+/* === Увеличиваем мелкий шрифт по всему интерфейсу === */
 :root{
   --fs-mini: 11px;  /* было 9px */
   --fs-small: 12px; /* было 10–11px */
   --lh-mini: 1.35;
 }
-
-/* Самые мелкие подписи (типа "дней с заданиями") */
 .sd{
   font-size: var(--fs-mini) !important;
   line-height: var(--lh-mini) !important;
 }
-
-/* Подзаголовок в шапке */
 .sub{
   font-size: var(--fs-small) !important;
   line-height: var(--lh-mini) !important;
 }
-
-/* Все "микро"-тексты на карточках/графике/модалках */
 .cdow, .cbadge, .ctasks, .pct-sub,
 .ml, .fi-s, .cl, .li,
 .msect, .mml, .mms, .mrlabel,
@@ -156,8 +151,6 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
   font-size: var(--fs-mini) !important;
   line-height: var(--lh-mini) !important;
 }
-
-/* Настройки (Будни/Суббота/Воскресенье) — чуть крупнее */
 .settings label{
   font-size: var(--fs-small) !important;
   line-height: var(--lh-mini) !important;
@@ -264,6 +257,8 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
               <th>№ задания</th>
               <th>Дата задания</th>
               <th>Клиент</th>
+              <th>Начало сборки</th>
+              <th>Окончание сборки</th>
               <th>Артикулов</th>
               <th>Товаров</th>
               <th>Дата доставки</th>
@@ -374,8 +369,9 @@ function processMain(txt){
     var goods=parseInt(c[2])||0;
     var dd=parseDate(c[3]);
     var ds=parseDate(c[4]);
+    var de=parseDate(c[5]); // <-- ДОБАВИЛИ: окончание сборки
     if(!dd||!num) return;
-    rawRows.push({num:num,names:names,goods:goods,dd:dd,ds:ds});
+    rawRows.push({num:num,names:names,goods:goods,dd:dd,ds:ds,de:de});
   });
 }
 
@@ -510,10 +506,16 @@ function openDayMod(key){
   d.tasks.forEach(function(t){
     var cl=t.client||clientMap[t.num]||'—';
     var td = taskDateMap[t.num] ? dfmt(taskDateMap[t.num]) : '—';
+
     th+='<tr class="tr-click" onclick="openTaskMod(\''+t.num+'\')">';
     th+='<td class="task-num-cell">'+t.num+'</td>';
     th+='<td class="date-cell">'+td+'</td>';
     th+='<td class="client-cell">'+cl+'</td>';
+
+    // НОВОЕ: Начало/Окончание сборки из "Свод по заданиям" (E/F)
+    th+='<td class="date-cell">'+dfmt(t.ds)+'</td>';
+    th+='<td class="date-cell">'+dfmt(t.de)+'</td>';
+
     th+='<td style="text-align:center;font-weight:700">'+t.names+'</td>';
     th+='<td style="text-align:center;font-weight:700">'+t.goods+'</td>';
     th+='<td class="date-cell">'+dfmt(t.dd)+'</td>';
