@@ -304,6 +304,11 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
 var SHEET_ID = '1EiQUyv_4wDPW0zjeq3z39DB_CTDcR4sR6T48RFrXviY';
 var GID_MAIN = '1755493785'; // Свод по заданиям: A=№, B=наим, C=кол, D=дата отгр, E=дата нач сборки, F=дата окн сборки
 var GID_COMP = '837445101';  // Состав: A=№, B=дата задания, C=артикул, D=наим, E=кол, F=клиент
+
+// ВАЖНО: укажите gid листа "Праздники" (колонка A = даты dd.MM.yyyy)
+// Откройте лист "Праздники" → в URL будет ...#gid=123456789 → это и вставьте сюда.
+var GID_HOL  = ''; // например: '123456789'
+
 var NORM_N = 80;
 var NORM_G = 250;
 
@@ -312,6 +317,8 @@ var compRows = []; // из Состава
 var clientMap = {};    // num -> client (из Состава)
 var taskDateMap = {};  // num -> дата задания (из Состава)
 var dayMap   = {};
+
+var holidaySet = {};   // dkey -> true (праздничные выходные)
 
 function parseDate(s){
   if(!s||!String(s).trim()) return null;
@@ -326,6 +333,7 @@ function dkey(d){return('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).sl
 function dfmt(d){if(!d)return '—';return('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+d.getFullYear();}
 function addDays(d,n){var r=new Date(d);r.setDate(r.getDate()+n);return r;}
 function dow(d){return['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][d.getDay()];}
+
 function getStaff(d){
   var dw=d.getDay();
   if(dw===6) return parseInt(document.getElementById('inp-sat').value)||2;
@@ -335,31 +343,74 @@ function getStaff(d){
 function color(p){return p>=100?'#ff3d57':p>=70?'#ffea00':'#00e676';}
 function cls(p){return p>=100?'r':p>=70?'y':'g';}
 
+function isHoliday(d){
+  return !!holidaySet[dkey(d)];
+}
+function processHolidays(txt){
+  holidaySet = {};
+  if(!txt) return;
+  var rows = parseCSV(txt);
+  rows.forEach(function(c){
+    var d = parseDate(c[0]);
+    if(d) holidaySet[dkey(d)] = true;
+  });
+}
+
+// Если рассчитанный день загрузки попал на праздник:
+// - если ПОНЕДЕЛЬНИК → переносим на ПЯТНИЦУ (−3 дня)
+// - иначе → переносим на день раньше (−1 день)
+// Повторяем, если снова праздник.
+function shiftBackIfHoliday(d){
+  var r = new Date(d); r.setHours(0,0,0,0);
+  var guard = 0;
+  while(isHoliday(r) && guard < 366){
+    r = addDays(r, r.getDay() === 1 ? -3 : -1);
+    r.setHours(0,0,0,0);
+    guard++;
+  }
+  return r;
+}
+
+// Если "сегодня" праздник — берём ближайший НЕпраздничный день вперёд
+function nextWorkDay(d){
+  var r = new Date(d); r.setHours(0,0,0,0);
+  var guard = 0;
+  while(isHoliday(r) && guard < 366){
+    r = addDays(r, 1);
+    r.setHours(0,0,0,0);
+    guard++;
+  }
+  return r;
+}
+
 function calcDay(row){
   var now = new Date(); now.setHours(0,0,0,0);
+  var workNow = nextWorkDay(now);
 
-  // 1) Если есть "Дата начала сборки" (row.ds) — берем её
-  //    но если она в прошлом → считаем как сегодня
+  var d = null;
+
+  // 1) Если есть "Дата начала сборки" (row.ds) — берём её (приоритет)
   if(row.ds){
-    var d = new Date(row.ds); d.setHours(0,0,0,0);
-    return d < now ? now : d;
+    d = new Date(row.ds);
+    d.setHours(0,0,0,0);
   }
-
-  // 2) Иначе берем "Дату доставки" (row.dd)
-  //    обычно: доставка - 1 день
+  // 2) Иначе — от даты доставки:
+  //    обычно доставка - 1 день
   //    НОВОЕ: если доставка в ПОНЕДЕЛЬНИК → нагрузка в ПЯТНИЦУ (доставка - 3 дня)
-  if(row.dd){
-    var isMonday = row.dd.getDay() === 1; // 1 = Пн (0=Вс, 6=Сб)
-    var offset = isMonday ? -3 : -1;
-
-    var d2 = addDays(row.dd, offset);
-    d2.setHours(0,0,0,0);
-
-    // просрочка → на сегодня
-    return d2 < now ? now : d2;
+  else if(row.dd){
+    var isMondayDelivery = row.dd.getDay() === 1; // 1 = Пн
+    var offset = isMondayDelivery ? -3 : -1;
+    d = addDays(row.dd, offset);
+    d.setHours(0,0,0,0);
+  } else {
+    return null;
   }
 
-  return null;
+  // 3) Праздники: если попали на праздничный выходной — переносим НАЗАД
+  d = shiftBackIfHoliday(d);
+
+  // 4) Просрочка: если день меньше "сегодня" (а если сегодня праздник — то меньше ближайшего рабочего)
+  return d < workNow ? workNow : d;
 }
 
 function parseCSV(txt){
@@ -389,14 +440,18 @@ function processMain(txt){
     var goods=parseInt(c[2])||0;
     var dd=parseDate(c[3]);
     var ds=parseDate(c[4]);
-    var de=parseDate(c[5]); // <-- ДОБАВИЛИ: окончание сборки
-    if(!dd||!num) return;
+    var de=parseDate(c[5]);
+
+    // было: if(!dd||!num) return;
+    // теперь: достаточно номера (чтобы задания без даты доставки, но с датой начала сборки тоже попадали)
+    if(!num) return;
+
     rawRows.push({num:num,names:names,goods:goods,dd:dd,ds:ds,de:de});
   });
 }
 
 function processComp(txt){
-  // Состав заданий (НОВАЯ структура):
+  // Состав заданий:
   // A=№задания B=дата задания C=артикул D=наим E=кол F=клиент
   var rows = parseCSV(txt);
   compRows = [];
@@ -427,7 +482,6 @@ function buildDayMap(){
     var ld=calcDay(r);if(!ld)return;
     var k=dkey(ld);
     if(!dayMap[k]) dayMap[k]={date:ld,key:k,tasks:[],names:0,goods:0};
-    // Добавляем клиента из clientMap
     r.client=clientMap[r.num]||'';
     dayMap[k].tasks.push(r);
     dayMap[k].names+=r.names;
@@ -531,11 +585,8 @@ function openDayMod(key){
     th+='<td class="task-num-cell">'+t.num+'</td>';
     th+='<td class="date-cell">'+td+'</td>';
     th+='<td class="client-cell">'+cl+'</td>';
-
-    // НОВОЕ: Начало/Окончание сборки из "Свод по заданиям" (E/F)
     th+='<td class="date-cell">'+dfmt(t.ds)+'</td>';
     th+='<td class="date-cell">'+dfmt(t.de)+'</td>';
-
     th+='<td style="text-align:center;font-weight:700">'+t.names+'</td>';
     th+='<td style="text-align:center;font-weight:700">'+t.goods+'</td>';
     th+='<td class="date-cell">'+dfmt(t.dd)+'</td>';
@@ -583,6 +634,7 @@ function openTaskMod(num){
 
 function closeDayMod(e){if(e.target.id==='overlay')document.getElementById('overlay').classList.remove('on');}
 function closeTaskMod(e){if(e.target.id==='overlay2')document.getElementById('overlay2').classList.remove('on');}
+
 function setView(v){
   document.getElementById('view-cards').style.display=v==='cards'?'':'none';
   document.getElementById('view-chart').style.display=v==='chart'?'':'none';
@@ -599,19 +651,31 @@ function fetchCSV(gid){
 function loadData(){
   document.getElementById('loading').style.display='block';
   document.getElementById('grid').innerHTML='';
-  Promise.all([fetchCSV(GID_MAIN),fetchCSV(GID_COMP)])
+
+  // 3-й источник (праздники) — опционально: если GID_HOL пустой, просто не учитываем
+  var pH = (GID_HOL && String(GID_HOL).trim())
+    ? fetchCSV(GID_HOL).catch(function(){ return ''; })
+    : Promise.resolve('');
+
+  Promise.all([fetchCSV(GID_MAIN), fetchCSV(GID_COMP), pH])
     .then(function(res){
       document.getElementById('loading').style.display='none';
+
       processMain(res[0]);
       processComp(res[1]);
+      processHolidays(res[2]); // если пусто — holidaySet будет {}
+
       buildDayMap();
       render();
+
       var n=new Date();
       document.getElementById('upd-time').textContent='Обновлено '+('0'+n.getHours()).slice(-2)+':'+('0'+n.getMinutes()).slice(-2);
       document.getElementById('dot').className='dot';
     })
     .catch(function(e){
-      document.getElementById('loading').innerHTML='<div class="err-box">⚠️ Не удалось загрузить данные.<br>'+e.message+'<br><br>Откройте доступ к таблице:<br><b>Файл → Настройки доступа → Все у кого есть ссылка → Читатель</b></div>';
+      document.getElementById('loading').innerHTML=
+        '<div class="err-box">⚠️ Не удалось загрузить данные.<br>'+e.message+
+        '<br><br>Откройте доступ к таблице:<br><b>Файл → Настройки доступа → Все у кого есть ссылка → Читатель</b></div>';
       document.getElementById('dot').className='dot err';
     });
 }
