@@ -385,7 +385,7 @@ function timeToSec(s){
   return hh * 3600 + mm * 60 + ss;
 }
 
-ffunction sortTasksByCreated(a, b){
+function sortTasksByCreated(a, b){
   // 1. Сначала по дате доставки
   var add = a.dd ? new Date(a.dd).getTime() : Number.MAX_SAFE_INTEGER;
   var bdd = b.dd ? new Date(b.dd).getTime() : Number.MAX_SAFE_INTEGER;
