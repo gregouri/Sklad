@@ -116,7 +116,7 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
 .err-box{background:#1a0f10;border:1px solid #ff3d57;border-radius:6px;padding:14px;font-size:12px;color:#ff8a80;line-height:1.7}
 
 /* === Осветляем "серый" текст для читаемости === */
-:root{ --muted:#9ca3af; } /* можно сделать ещё светлее: #cbd5e1 */
+:root{ --muted:#9ca3af; }
 .sub, .settings label, .sd, .tb, .cdow, .ctasks, .pct-sub,
 .ml, .fi-s, .chart-hdr, .cl, .li,
 .msect, .mml, .mms, .mrlabel,
@@ -129,8 +129,8 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
 
 /* === Увеличиваем мелкий шрифт по всему интерфейсу === */
 :root{
-  --fs-mini: 11px;  /* было 9px */
-  --fs-small: 12px; /* было 10–11px */
+  --fs-mini: 11px;
+  --fs-small: 12px;
   --lh-mini: 1.35;
 }
 .sd{
@@ -220,7 +220,10 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
 <div class="overlay" id="overlay" onclick="closeDayMod(event)">
   <div class="modal">
     <div class="mh">
-      <div><div class="mdate" id="md"></div><div style="font-size:10px;color:#6b7280" id="mdow"></div></div>
+      <div>
+        <div class="mdate" id="md"></div>
+        <div style="font-size:10px;color:#6b7280" id="mdow"></div>
+      </div>
       <button class="mclose" onclick="document.getElementById('overlay').classList.remove('on')">✕</button>
     </div>
 
@@ -305,33 +308,52 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
 var SHEET_ID = '1EiQUyv_4wDPW0zjeq3z39DB_CTDcR4sR6T48RFrXviY';
 var GID_MAIN = '1755493785'; // Свод по заданиям: A=№, B=наим, C=кол, D=дата отгр, E=дата нач сборки, F=дата окн сборки, G=время создания
 var GID_COMP = '837445101';  // Состав: A=№, B=дата задания, C=артикул, D=наим, E=кол, F=клиент
-
-// ВАЖНО: укажите gid листа "Праздники" (колонка A = даты dd.MM.yyyy)
-// Откройте лист "Праздники" → в URL будет ...#gid=123456789 → это и вставьте сюда.
-var GID_HOL  = '468550991'; // например: '123456789'
+var GID_HOL  = '468550991';
 
 var NORM_N = 80;
 var NORM_G = 250;
 
-var rawRows  = []; // из Свода
-var compRows = []; // из Состава
-var clientMap = {};      // num -> client (из Состава)
-var taskDateMap = {};    // num -> дата задания (из Состава)
-var createTimeMap = {};  // num -> время создания (из Свода)
-var dayMap   = {};
-
-var holidaySet = {};   // dkey -> true (праздничные выходные)
+var rawRows  = [];
+var compRows = [];
+var clientMap = {};
+var taskDateMap = {};
+var createTimeMap = {};
+var dayMap = {};
+var holidaySet = {};
 
 function parseDate(s){
-  if(!s||!String(s).trim()) return null;
-  s=String(s).trim();
+  if(!s || !String(s).trim()) return null;
+  s = String(s).trim();
   var p;
-  if(/^\d{2}\.\d{2}\.\d{4}$/.test(s)){p=s.split('.');return new Date(+p[2],+p[1]-1,+p[0]);}
-  if(/^\d{4}-\d{2}-\d{2}/.test(s)){p=s.slice(0,10).split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
-  if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)){p=s.split('/');return new Date(+p[2],+p[0]-1,+p[1]);}
-  var d=new Date(s); return isNaN(d)?null:(d.setHours(0,0,0,0),d);
+  if(/^\d{2}\.\d{2}\.\d{4}$/.test(s)){
+    p = s.split('.');
+    return new Date(+p[2], +p[1]-1, +p[0]);
+  }
+  if(/^\d{4}-\d{2}-\d{2}/.test(s)){
+    p = s.slice(0,10).split('-');
+    return new Date(+p[0], +p[1]-1, +p[2]);
+  }
+  if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)){
+    p = s.split('/');
+    return new Date(+p[2], +p[0]-1, +p[1]);
+  }
+  var d = new Date(s);
+  return isNaN(d) ? null : (d.setHours(0,0,0,0), d);
 }
-function dfmt(d){if(!d)return '—';return('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+d.getFullYear();}
+
+function dkey(d){
+  return ('0' + d.getDate()).slice(-2) + '.' +
+         ('0' + (d.getMonth()+1)).slice(-2) + '.' +
+         d.getFullYear();
+}
+
+function dfmt(d){
+  if(!d) return '—';
+  return ('0' + d.getDate()).slice(-2) + '.' +
+         ('0' + (d.getMonth()+1)).slice(-2) + '.' +
+         d.getFullYear();
+}
+
 function tfmt(s){
   if(s === null || s === undefined) return '—';
   s = String(s).trim();
@@ -347,6 +369,10 @@ function tfmt(s){
     var ss = p.length >= 3 ? ':' + ('0' + parseInt(p[2], 10)).slice(-2) : '';
     return hh + ':' + mm + ss;
   }
+
+  return s;
+}
+
 function timeToSec(s){
   s = tfmt(s);
   if(!s || s === '—') return Number.MAX_SAFE_INTEGER;
@@ -377,23 +403,31 @@ function sortTasksByCreated(a, b){
 
   return String(a.num).localeCompare(String(b.num), 'ru');
 }
-  return s;
+
+function addDays(d,n){
+  var r = new Date(d);
+  r.setDate(r.getDate() + n);
+  return r;
 }
-function addDays(d,n){var r=new Date(d);r.setDate(r.getDate()+n);return r;}
-function dow(d){return['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][d.getDay()];}
+
+function dow(d){
+  return ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][d.getDay()];
+}
 
 function getStaff(d){
-  var dw=d.getDay();
-  if(dw===6) return parseInt(document.getElementById('inp-sat').value)||2;
-  if(dw===0) return parseInt(document.getElementById('inp-sun').value)||1;
-  return parseInt(document.getElementById('inp-wd').value)||3;
+  var dw = d.getDay();
+  if(dw === 6) return parseInt(document.getElementById('inp-sat').value, 10) || 2;
+  if(dw === 0) return parseInt(document.getElementById('inp-sun').value, 10) || 1;
+  return parseInt(document.getElementById('inp-wd').value, 10) || 3;
 }
-function color(p){return p>=100?'#ff3d57':p>=70?'#ffea00':'#00e676';}
-function cls(p){return p>=100?'r':p>=70?'y':'g';}
+
+function color(p){ return p >= 100 ? '#ff3d57' : p >= 70 ? '#ffea00' : '#00e676'; }
+function cls(p){ return p >= 100 ? 'r' : p >= 70 ? 'y' : 'g'; }
 
 function isHoliday(d){
   return !!holidaySet[dkey(d)];
 }
+
 function processHolidays(txt){
   holidaySet = {};
   if(!txt) return;
@@ -404,12 +438,9 @@ function processHolidays(txt){
   });
 }
 
-// Если рассчитанный день загрузки попал на праздник:
-// - если ПОНЕДЕЛЬНИК → переносим на ПЯТНИЦУ (−3 дня)
-// - иначе → переносим на день раньше (−1 день)
-// Повторяем, если снова праздник.
 function shiftBackIfHoliday(d){
-  var r = new Date(d); r.setHours(0,0,0,0);
+  var r = new Date(d);
+  r.setHours(0,0,0,0);
   var guard = 0;
   while(isHoliday(r) && guard < 366){
     r = addDays(r, r.getDay() === 1 ? -3 : -1);
@@ -419,9 +450,9 @@ function shiftBackIfHoliday(d){
   return r;
 }
 
-// Если "сегодня" праздник — берём ближайший НЕпраздничный день вперёд
 function nextWorkDay(d){
-  var r = new Date(d); r.setHours(0,0,0,0);
+  var r = new Date(d);
+  r.setHours(0,0,0,0);
   var guard = 0;
   while(isHoliday(r) && guard < 366){
     r = addDays(r, 1);
@@ -432,21 +463,17 @@ function nextWorkDay(d){
 }
 
 function calcDay(row){
-  var now = new Date(); now.setHours(0,0,0,0);
+  var now = new Date();
+  now.setHours(0,0,0,0);
   var workNow = nextWorkDay(now);
 
   var d = null;
 
-  // 1) Если есть "Дата начала сборки" (row.ds) — берём её (приоритет)
   if(row.ds){
     d = new Date(row.ds);
     d.setHours(0,0,0,0);
-  }
-  // 2) Иначе — от даты доставки:
-  //    обычно доставка - 1 день
-  //    НОВОЕ: если доставка в ПОНЕДЕЛЬНИК → нагрузка в ПЯТНИЦУ (доставка - 3 дня)
-  else if(row.dd){
-    var isMondayDelivery = row.dd.getDay() === 1; // 1 = Пн
+  } else if(row.dd){
+    var isMondayDelivery = row.dd.getDay() === 1;
     var offset = isMondayDelivery ? -3 : -1;
     d = addDays(row.dd, offset);
     d.setHours(0,0,0,0);
@@ -454,41 +481,37 @@ function calcDay(row){
     return null;
   }
 
-  // 3) Праздники: если попали на праздничный выходной — переносим НАЗАД
   d = shiftBackIfHoliday(d);
-
-  // 4) Просрочка: если день меньше "сегодня" (а если сегодня праздник — то меньше ближайшего рабочего)
   return d < workNow ? workNow : d;
 }
 
 function parseCSV(txt){
-  var lines=txt.split(/\r?\n/),rows=[];
-  for(var i=1;i<lines.length;i++){
-    var line=lines[i].trim();if(!line)continue;
-    var cols=[],inq=false,cur='';
-    for(var j=0;j<line.length;j++){
-      var ch=line[j];
-      if(ch==='"'){inq=!inq;}
-      else if(ch===','&&!inq){cols.push(cur);cur='';}
-      else cur+=ch;
+  var lines = txt.split(/\r?\n/), rows = [];
+  for(var i = 1; i < lines.length; i++){
+    var line = lines[i].trim();
+    if(!line) continue;
+    var cols = [], inq = false, cur = '';
+    for(var j = 0; j < line.length; j++){
+      var ch = line[j];
+      if(ch === '"'){ inq = !inq; }
+      else if(ch === ',' && !inq){ cols.push(cur); cur = ''; }
+      else cur += ch;
     }
     cols.push(cur);
-    rows.push(cols.map(function(c){return(c||'').trim();}));
+    rows.push(cols.map(function(c){ return (c || '').trim(); }));
   }
   return rows;
 }
 
 function processMain(txt){
-  // Свод по заданиям:
-  // A=№задания B=наим C=кол D=датаОтгрузки E=датаНачСборки F=датаОкнСборки G=времяСоздания
   var rows = parseCSV(txt);
   rawRows = [];
   createTimeMap = {};
 
   rows.forEach(function(c){
     var num   = c[0];
-    var names = parseInt(c[1]) || 0;
-    var goods = parseInt(c[2]) || 0;
+    var names = parseInt(c[1], 10) || 0;
+    var goods = parseInt(c[2], 10) || 0;
     var dd    = parseDate(c[3]);
     var ds    = parseDate(c[4]);
     var de    = parseDate(c[5]);
@@ -511,8 +534,6 @@ function processMain(txt){
 }
 
 function processComp(txt){
-  // Состав заданий:
-  // A=№задания B=дата задания C=артикул D=наим E=кол F=клиент
   var rows = parseCSV(txt);
   compRows = [];
   clientMap = {};
@@ -523,12 +544,19 @@ function processComp(txt){
     var tdate  = parseDate(c[1]);
     var art    = c[2];
     var name   = c[3];
-    var qty    = parseInt(c[4]) || 0;
+    var qty    = parseInt(c[4], 10) || 0;
     var client = c[5] || '';
 
     if(!num || !art) return;
 
-    compRows.push({num:num, tdate:tdate, art:art, name:name, qty:qty, client:client});
+    compRows.push({
+      num: num,
+      tdate: tdate,
+      art: art,
+      name: name,
+      qty: qty,
+      client: client
+    });
 
     if(!clientMap[num] && client) clientMap[num] = client;
     if(!taskDateMap[num] && tdate) taskDateMap[num] = tdate;
@@ -536,78 +564,91 @@ function processComp(txt){
 }
 
 function buildDayMap(){
-  dayMap={};
+  dayMap = {};
   rawRows.forEach(function(r){
-    var ld=calcDay(r);if(!ld)return;
-    var k=dkey(ld);
-    if(!dayMap[k]) dayMap[k]={date:ld,key:k,tasks:[],names:0,goods:0};
-    r.client=clientMap[r.num]||'';
+    var ld = calcDay(r);
+    if(!ld) return;
+
+    var k = dkey(ld);
+    if(!dayMap[k]){
+      dayMap[k] = {date: ld, key: k, tasks: [], names: 0, goods: 0};
+    }
+
+    r.client = clientMap[r.num] || '';
     dayMap[k].tasks.push(r);
-    dayMap[k].names+=r.names;
-    dayMap[k].goods+=r.goods;
+    dayMap[k].names += r.names;
+    dayMap[k].goods += r.goods;
   });
 }
 
 function render(){
-  var days=Object.values(dayMap).sort(function(a,b){return a.date-b.date;});
-  var tot=0,ov=0,fr=0;
+  var days = Object.values(dayMap).sort(function(a,b){ return a.date - b.date; });
+  var tot = 0, ov = 0, fr = 0;
+
   days.forEach(function(d){
-    tot+=d.tasks.length;
-    var s=getStaff(d.date);
-    var pn=Math.round(d.names/(s*NORM_N)*100);
-    var pg=Math.round(d.goods/(s*NORM_G)*100);
-    Math.max(pn,pg)>=100?ov++:fr++;
+    tot += d.tasks.length;
+    var s = getStaff(d.date);
+    var pn = Math.round(d.names / (s * NORM_N) * 100);
+    var pg = Math.round(d.goods / (s * NORM_G) * 100);
+    Math.max(pn, pg) >= 100 ? ov++ : fr++;
   });
-  document.getElementById('s-days').textContent=days.length;
-  document.getElementById('s-tasks').textContent=tot;
-  document.getElementById('s-over').textContent=ov;
-  document.getElementById('s-free').textContent=fr;
+
+  document.getElementById('s-days').textContent = days.length;
+  document.getElementById('s-tasks').textContent = tot;
+  document.getElementById('s-over').textContent = ov;
+  document.getElementById('s-free').textContent = fr;
+
   buildCards(days);
   buildChart(days);
 }
 
 function buildCards(days){
-  var html='';
+  var html = '';
   days.forEach(function(d){
-    var s=getStaff(d.date),nN=s*NORM_N,nG=s*NORM_G;
-    var pn=Math.round(d.names/nN*100),pg=Math.round(d.goods/nG*100);
-    var pm=Math.max(pn,pg),c=color(pm),cl=cls(pm);
-    var fN=Math.max(0,nN-d.names),fG=Math.max(0,nG-d.goods);
-    var dd=('0'+d.date.getDate()).slice(-2),mm=('0'+(d.date.getMonth()+1)).slice(-2);
-    html+='<div class="card '+cl+'" onclick="openDayMod(\''+d.key+'\')">';
-    html+='<div class="cdate">'+dd+'.'+mm+'</div>';
-    html+='<div class="cdow">'+dow(d.date)+'</div>';
-    html+='<div class="cbadge">&#9679; '+s+' кладовщик'+(s>1?'а':'')+'</div>';
-    html+='<div class="ctasks">'+d.tasks.length+' задани'+(d.tasks.length===1?'е':d.tasks.length<5?'я':'й')+'</div>';
-    html+='<div class="pct-big" style="color:'+c+'">'+pn+'%</div>';
-    html+='<div class="pct-sub">по наименованиям</div>';
-    html+='<div class="pb"><div class="pf" style="width:'+Math.min(pn,100)+'%;background:'+c+'"></div></div>';
-    html+='<div class="pb"><div class="pf" style="width:'+Math.min(pg,100)+'%;background:#7c4dff"></div></div>';
-    html+='<div class="mr"><span class="ml">По товарам</span><span class="mv">'+pg+'%</span></div>';
-    html+='<div class="free"><div class="fl">Свободно до нормы</div>';
-    html+='<div class="fn"><div class="fi"><div class="fi-n">'+fN+'</div><div class="fi-s">наим.</div></div>';
-    html+='<div class="fi"><div class="fi-n">'+fG+'</div><div class="fi-s">товаров</div></div></div></div></div>';
+    var s = getStaff(d.date), nN = s * NORM_N, nG = s * NORM_G;
+    var pn = Math.round(d.names / nN * 100), pg = Math.round(d.goods / nG * 100);
+    var pm = Math.max(pn, pg), c = color(pm), cl = cls(pm);
+    var fN = Math.max(0, nN - d.names), fG = Math.max(0, nG - d.goods);
+    var dd = ('0' + d.date.getDate()).slice(-2), mm = ('0' + (d.date.getMonth() + 1)).slice(-2);
+
+    html += '<div class="card ' + cl + '" onclick="openDayMod(\'' + d.key + '\')">';
+    html += '<div class="cdate">' + dd + '.' + mm + '</div>';
+    html += '<div class="cdow">' + dow(d.date) + '</div>';
+    html += '<div class="cbadge">&#9679; ' + s + ' кладовщик' + (s > 1 ? 'а' : '') + '</div>';
+    html += '<div class="ctasks">' + d.tasks.length + ' задани' + (d.tasks.length === 1 ? 'е' : d.tasks.length < 5 ? 'я' : 'й') + '</div>';
+    html += '<div class="pct-big" style="color:' + c + '">' + pn + '%</div>';
+    html += '<div class="pct-sub">по наименованиям</div>';
+    html += '<div class="pb"><div class="pf" style="width:' + Math.min(pn,100) + '%;background:' + c + '"></div></div>';
+    html += '<div class="pb"><div class="pf" style="width:' + Math.min(pg,100) + '%;background:#7c4dff"></div></div>';
+    html += '<div class="mr"><span class="ml">По товарам</span><span class="mv">' + pg + '%</span></div>';
+    html += '<div class="free"><div class="fl">Свободно до нормы</div>';
+    html += '<div class="fn"><div class="fi"><div class="fi-n">' + fN + '</div><div class="fi-s">наим.</div></div>';
+    html += '<div class="fi"><div class="fi-n">' + fG + '</div><div class="fi-s">товаров</div></div></div></div></div>';
   });
-  document.getElementById('grid').innerHTML=html;
+
+  document.getElementById('grid').innerHTML = html;
 }
 
 function buildChart(days){
-  var maxP=110,H=180;
-  document.getElementById('line100').style.bottom=((100/maxP)*H)+'px';
-  var bh='',lh='';
+  var maxP = 110, H = 180;
+  document.getElementById('line100').style.bottom = ((100 / maxP) * H) + 'px';
+
+  var bh = '', lh = '';
   days.forEach(function(d){
-    var s=getStaff(d.date);
-    var pn=Math.round(d.names/(s*NORM_N)*100),pg=Math.round(d.goods/(s*NORM_G)*100);
-    var hN=Math.min((pn/maxP)*H,H),hG=Math.min((pg/maxP)*H,H);
-    var c=color(Math.max(pn,pg));
-    var dd=('0'+d.date.getDate()).slice(-2),mm=('0'+(d.date.getMonth()+1)).slice(-2);
-    bh+='<div class="bgroup" onclick="openDayMod(\''+d.key+'\')">';
-    bh+='<div class="b" style="height:'+hN+'px;background:'+c+';opacity:0.9"></div>';
-    bh+='<div class="b" style="height:'+hG+'px;background:#7c4dff;opacity:0.8"></div></div>';
-    lh+='<div class="cl">'+dd+'.'+mm+'<br>'+dow(d.date)+'</div>';
+    var s = getStaff(d.date);
+    var pn = Math.round(d.names / (s * NORM_N) * 100), pg = Math.round(d.goods / (s * NORM_G) * 100);
+    var hN = Math.min((pn / maxP) * H, H), hG = Math.min((pg / maxP) * H, H);
+    var c = color(Math.max(pn, pg));
+    var dd = ('0' + d.date.getDate()).slice(-2), mm = ('0' + (d.date.getMonth() + 1)).slice(-2);
+
+    bh += '<div class="bgroup" onclick="openDayMod(\'' + d.key + '\')">';
+    bh += '<div class="b" style="height:' + hN + 'px;background:' + c + ';opacity:0.9"></div>';
+    bh += '<div class="b" style="height:' + hG + 'px;background:#7c4dff;opacity:0.8"></div></div>';
+    lh += '<div class="cl">' + dd + '.' + mm + '<br>' + dow(d.date) + '</div>';
   });
-  document.getElementById('bars').innerHTML=bh;
-  document.getElementById('clabels').innerHTML=lh;
+
+  document.getElementById('bars').innerHTML = bh;
+  document.getElementById('clabels').innerHTML = lh;
 }
 
 function openDayMod(key){
@@ -617,7 +658,7 @@ function openDayMod(key){
   var s = getStaff(d.date), nN = s * NORM_N, nG = s * NORM_G;
   var pn = Math.round(d.names / nN * 100), pg = Math.round(d.goods / nG * 100);
   var fN = Math.max(0, nN - d.names), fG = Math.max(0, nG - d.goods);
-  var cn = color(pn);
+  var cn = color(Math.max(pn, pg));
   var dd = ('0' + d.date.getDate()).slice(-2), mm = ('0' + (d.date.getMonth() + 1)).slice(-2);
 
   document.getElementById('md').textContent = dd + '.' + mm + '.' + d.date.getFullYear();
@@ -674,52 +715,65 @@ function openTaskMod(num){
   document.getElementById('t2-num').textContent = 'Задание № ' + num + td + tt;
   document.getElementById('t2-sub').textContent = (client ? client + ' · ' : '') + 'состав заказа';
 
-  if(items.length===0){
-    document.getElementById('t2-summary').innerHTML='';
-    document.getElementById('t2-body').innerHTML='<tr><td colspan="3" style="padding:16px;color:#6b7280;text-align:center">Состав не найден</td></tr>';
+  if(items.length === 0){
+    document.getElementById('t2-summary').innerHTML = '';
+    document.getElementById('t2-body').innerHTML = '<tr><td colspan="3" style="padding:16px;color:#6b7280;text-align:center">Состав не найден</td></tr>';
     document.getElementById('overlay2').classList.add('on');
     return;
   }
 
-  var totalQty=0;
-  items.forEach(function(it){totalQty+=it.qty;});
+  var totalQty = 0;
+  items.forEach(function(it){ totalQty += it.qty; });
 
-  document.getElementById('t2-summary').innerHTML=
-    '<div class="cs-item"><div class="cs-num">'+items.length+'</div><div class="cs-label">артикулов</div></div>'+
-    '<div class="cs-item"><div class="cs-num">'+totalQty+'</div><div class="cs-label">товаров</div></div>'+
-    (client?'<div class="cs-item"><div class="cs-num" style="font-size:13px;color:#a78bfa">'+client+'</div><div class="cs-label">клиент</div></div>':'');
+  document.getElementById('t2-summary').innerHTML =
+    '<div class="cs-item"><div class="cs-num">' + items.length + '</div><div class="cs-label">артикулов</div></div>' +
+    '<div class="cs-item"><div class="cs-num">' + totalQty + '</div><div class="cs-label">товаров</div></div>' +
+    (client ? '<div class="cs-item"><div class="cs-num" style="font-size:13px;color:#a78bfa">' + client + '</div><div class="cs-label">клиент</div></div>' : '');
 
-  var rows='';
+  var rows = '';
   items.forEach(function(it){
-    rows+='<tr>';
-    rows+='<td class="art-cell">'+it.art+'</td>';
-    rows+='<td class="name-cell">'+it.name+'</td>';
-    rows+='<td class="qty-cell">'+it.qty+' шт</td>';
-    rows+='</tr>';
+    rows += '<tr>';
+    rows += '<td class="art-cell">' + it.art + '</td>';
+    rows += '<td class="name-cell">' + it.name + '</td>';
+    rows += '<td class="qty-cell">' + it.qty + ' шт</td>';
+    rows += '</tr>';
   });
-  document.getElementById('t2-body').innerHTML=rows;
+
+  document.getElementById('t2-body').innerHTML = rows;
   document.getElementById('overlay2').classList.add('on');
 }
 
-function closeDayMod(e){if(e.target.id==='overlay')document.getElementById('overlay').classList.remove('on');}
-function closeTaskMod(e){if(e.target.id==='overlay2')document.getElementById('overlay2').classList.remove('on');}
+function closeDayMod(e){
+  if(e.target.id === 'overlay') document.getElementById('overlay').classList.remove('on');
+}
+
+function closeTaskMod(e){
+  if(e.target.id === 'overlay2') document.getElementById('overlay2').classList.remove('on');
+}
 
 function setView(v){
-  document.getElementById('view-cards').style.display=v==='cards'?'':'none';
-  document.getElementById('view-chart').style.display=v==='chart'?'':'none';
-  document.getElementById('btn-cards').className='tb'+(v==='cards'?' on':'');
-  document.getElementById('btn-chart').className='tb'+(v==='chart'?' on':'');
+  document.getElementById('view-cards').style.display = v === 'cards' ? '' : 'none';
+  document.getElementById('view-chart').style.display = v === 'chart' ? '' : 'none';
+  document.getElementById('btn-cards').className = 'tb' + (v === 'cards' ? ' on' : '');
+  document.getElementById('btn-chart').className = 'tb' + (v === 'chart' ? ' on' : '');
 }
-function recalc(){buildDayMap();render();}
+
+function recalc(){
+  buildDayMap();
+  render();
+}
 
 function fetchCSV(gid){
-  var url='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/export?format=csv&gid='+gid;
-  return fetch(url).then(function(r){if(!r.ok)throw new Error('Ошибка '+r.status);return r.text();});
+  var url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv&gid=' + gid;
+  return fetch(url).then(function(r){
+    if(!r.ok) throw new Error('Ошибка ' + r.status);
+    return r.text();
+  });
 }
 
 function loadData(){
-  document.getElementById('loading').style.display='block';
-  document.getElementById('grid').innerHTML='';
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('grid').innerHTML = '';
 
   var pH = (GID_HOL && String(GID_HOL).trim())
     ? fetchCSV(GID_HOL).catch(function(){ return ''; })
@@ -727,7 +781,7 @@ function loadData(){
 
   Promise.all([fetchCSV(GID_MAIN), fetchCSV(GID_COMP), pH])
     .then(function(res){
-      document.getElementById('loading').style.display='none';
+      document.getElementById('loading').style.display = 'none';
 
       processMain(res[0]);
       processComp(res[1]);
@@ -736,20 +790,21 @@ function loadData(){
       buildDayMap();
       render();
 
-      var n=new Date();
-      document.getElementById('upd-time').textContent='Обновлено '+('0'+n.getHours()).slice(-2)+':'+('0'+n.getMinutes()).slice(-2);
-      document.getElementById('dot').className='dot';
+      var n = new Date();
+      document.getElementById('upd-time').textContent =
+        'Обновлено ' + ('0' + n.getHours()).slice(-2) + ':' + ('0' + n.getMinutes()).slice(-2);
+      document.getElementById('dot').className = 'dot';
     })
     .catch(function(e){
-      document.getElementById('loading').innerHTML=
-        '<div class="err-box">⚠️ Не удалось загрузить данные.<br>'+e.message+
+      document.getElementById('loading').innerHTML =
+        '<div class="err-box">⚠️ Не удалось загрузить данные.<br>' + e.message +
         '<br><br>Откройте доступ к таблице:<br><b>Файл → Настройки доступа → Все у кого есть ссылка → Читатель</b></div>';
-      document.getElementById('dot').className='dot err';
+      document.getElementById('dot').className = 'dot err';
     });
 }
 
 loadData();
-setInterval(loadData,60*60*1000);
+setInterval(loadData, 60 * 60 * 1000);
 </script>
 </body>
 </html>
