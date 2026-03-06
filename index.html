@@ -386,25 +386,25 @@ function timeToSec(s){
 }
 
 function sortTasksByCreated(a, b){
-  // 1. Сначала по дате доставки
-  var add = a.dd ? new Date(a.dd).getTime() : Number.MAX_SAFE_INTEGER;
-  var bdd = b.dd ? new Date(b.dd).getTime() : Number.MAX_SAFE_INTEGER;
+  // 1) Сначала по дате доставки
+  var aDel = a.dd ? a.dd.getTime() : Number.MAX_SAFE_INTEGER;
+  var bDel = b.dd ? b.dd.getTime() : Number.MAX_SAFE_INTEGER;
 
-  if(add !== bdd) return add - bdd;
+  if(aDel !== bDel) return aDel - bDel;
 
-  // 2. Потом по дате создания / дате задания
-  var acd = taskDateMap[a.num] ? taskDateMap[a.num].getTime() : Number.MAX_SAFE_INTEGER;
-  var bcd = taskDateMap[b.num] ? taskDateMap[b.num].getTime() : Number.MAX_SAFE_INTEGER;
+  // 2) Потом по дате задания / создания
+  var aCreateDate = taskDateMap[a.num] ? taskDateMap[a.num].getTime() : Number.MAX_SAFE_INTEGER;
+  var bCreateDate = taskDateMap[b.num] ? taskDateMap[b.num].getTime() : Number.MAX_SAFE_INTEGER;
 
-  if(acd !== bcd) return acd - bcd;
+  if(aCreateDate !== bCreateDate) return aCreateDate - bCreateDate;
 
-  // 3. Потом по времени создания
-  var act = timeToSec(a.ct || createTimeMap[a.num] || '');
-  var bct = timeToSec(b.ct || createTimeMap[b.num] || '');
+  // 3) Потом по времени создания
+  var aCreateTime = timeToSec(a.ct || createTimeMap[a.num] || '');
+  var bCreateTime = timeToSec(b.ct || createTimeMap[b.num] || '');
 
-  if(act !== bct) return act - bct;
+  if(aCreateTime !== bCreateTime) return aCreateTime - bCreateTime;
 
-  // 4. И если всё одинаковое — по номеру задания
+  // 4) Если всё одинаковое — по номеру задания
   var an = parseInt(a.num, 10);
   var bn = parseInt(b.num, 10);
 
