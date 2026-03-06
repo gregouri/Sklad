@@ -385,17 +385,26 @@ function timeToSec(s){
   return hh * 3600 + mm * 60 + ss;
 }
 
-function sortTasksByCreated(a, b){
-  var ad = taskDateMap[a.num] ? taskDateMap[a.num].getTime() : Number.MAX_SAFE_INTEGER;
-  var bd = taskDateMap[b.num] ? taskDateMap[b.num].getTime() : Number.MAX_SAFE_INTEGER;
+ffunction sortTasksByCreated(a, b){
+  // 1. Сначала по дате доставки
+  var add = a.dd ? new Date(a.dd).getTime() : Number.MAX_SAFE_INTEGER;
+  var bdd = b.dd ? new Date(b.dd).getTime() : Number.MAX_SAFE_INTEGER;
 
-  if(ad !== bd) return ad - bd;
+  if(add !== bdd) return add - bdd;
 
-  var at = timeToSec(a.ct || createTimeMap[a.num] || '');
-  var bt = timeToSec(b.ct || createTimeMap[b.num] || '');
+  // 2. Потом по дате создания / дате задания
+  var acd = taskDateMap[a.num] ? taskDateMap[a.num].getTime() : Number.MAX_SAFE_INTEGER;
+  var bcd = taskDateMap[b.num] ? taskDateMap[b.num].getTime() : Number.MAX_SAFE_INTEGER;
 
-  if(at !== bt) return at - bt;
+  if(acd !== bcd) return acd - bcd;
 
+  // 3. Потом по времени создания
+  var act = timeToSec(a.ct || createTimeMap[a.num] || '');
+  var bct = timeToSec(b.ct || createTimeMap[b.num] || '');
+
+  if(act !== bct) return act - bct;
+
+  // 4. И если всё одинаковое — по номеру задания
   var an = parseInt(a.num, 10);
   var bn = parseInt(b.num, 10);
 
