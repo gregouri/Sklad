@@ -256,6 +256,7 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
             <tr>
               <th>№ задания</th>
               <th>Дата задания</th>
+              <th>Время создания</th>
               <th>Клиент</th>
               <th>Начало сборки</th>
               <th>Окончание сборки</th>
@@ -302,7 +303,7 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
 
 <script>
 var SHEET_ID = '1EiQUyv_4wDPW0zjeq3z39DB_CTDcR4sR6T48RFrXviY';
-var GID_MAIN = '1755493785'; // Свод по заданиям: A=№, B=наим, C=кол, D=дата отгр, E=дата нач сборки, F=дата окн сборки
+var GID_MAIN = '1755493785'; // Свод по заданиям: A=№, B=наим, C=кол, D=дата отгр, E=дата нач сборки, F=дата окн сборки, G=время создания
 var GID_COMP = '837445101';  // Состав: A=№, B=дата задания, C=артикул, D=наим, E=кол, F=клиент
 
 // ВАЖНО: укажите gid листа "Праздники" (колонка A = даты dd.MM.yyyy)
@@ -314,8 +315,9 @@ var NORM_G = 250;
 
 var rawRows  = []; // из Свода
 var compRows = []; // из Состава
-var clientMap = {};    // num -> client (из Состава)
-var taskDateMap = {};  // num -> дата задания (из Состава)
+var clientMap = {};      // num -> client (из Состава)
+var taskDateMap = {};    // num -> дата задания (из Состава)
+var createTimeMap = {};  // num -> время создания (из Свода)
 var dayMap   = {};
 
 var holidaySet = {};   // dkey -> true (праздничные выходные)
@@ -331,6 +333,24 @@ function parseDate(s){
 }
 function dkey(d){return('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+d.getFullYear();}
 function dfmt(d){if(!d)return '—';return('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+d.getFullYear();}
+function tfmt(s){
+  if(s === null || s === undefined) return '—';
+  s = String(s).trim();
+  if(!s) return '—';
+
+  var m = s.match(/(\d{1,2}:\d{2}(?::\d{2})?)/);
+  if(m) s = m[1];
+
+  var p = s.split(':');
+  if(p.length >= 2){
+    var hh = ('0' + parseInt(p[0], 10)).slice(-2);
+    var mm = ('0' + parseInt(p[1], 10)).slice(-2);
+    var ss = p.length >= 3 ? ':' + ('0' + parseInt(p[2], 10)).slice(-2) : '';
+    return hh + ':' + mm + ss;
+  }
+
+  return s;
+}
 function addDays(d,n){var r=new Date(d);r.setDate(r.getDate()+n);return r;}
 function dow(d){return['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][d.getDay()];}
 
@@ -431,22 +451,34 @@ function parseCSV(txt){
 }
 
 function processMain(txt){
-  // Свод по заданиям: A=№задания B=наим C=кол D=датаОтгрузки E=датаНачСборки F=датаОкнСборки
-  var rows=parseCSV(txt);
-  rawRows=[];
-  rows.forEach(function(c){
-    var num=c[0];
-    var names=parseInt(c[1])||0;
-    var goods=parseInt(c[2])||0;
-    var dd=parseDate(c[3]);
-    var ds=parseDate(c[4]);
-    var de=parseDate(c[5]);
+  // Свод по заданиям:
+  // A=№задания B=наим C=кол D=датаОтгрузки E=датаНачСборки F=датаОкнСборки G=времяСоздания
+  var rows = parseCSV(txt);
+  rawRows = [];
+  createTimeMap = {};
 
-    // было: if(!dd||!num) return;
-    // теперь: достаточно номера (чтобы задания без даты доставки, но с датой начала сборки тоже попадали)
+  rows.forEach(function(c){
+    var num   = c[0];
+    var names = parseInt(c[1]) || 0;
+    var goods = parseInt(c[2]) || 0;
+    var dd    = parseDate(c[3]);
+    var ds    = parseDate(c[4]);
+    var de    = parseDate(c[5]);
+    var ct    = tfmt(c[6]);
+
     if(!num) return;
 
-    rawRows.push({num:num,names:names,goods:goods,dd:dd,ds:ds,de:de});
+    createTimeMap[num] = ct;
+
+    rawRows.push({
+      num: num,
+      names: names,
+      goods: goods,
+      dd: dd,
+      ds: ds,
+      de: de,
+      ct: ct
+    });
   });
 }
 
@@ -460,7 +492,7 @@ function processComp(txt){
 
   rows.forEach(function(c){
     var num    = c[0];
-    var tdate  = parseDate(c[1]); // Дата задания
+    var tdate  = parseDate(c[1]);
     var art    = c[2];
     var name   = c[3];
     var qty    = parseInt(c[4]) || 0;
@@ -470,7 +502,6 @@ function processComp(txt){
 
     compRows.push({num:num, tdate:tdate, art:art, name:name, qty:qty, client:client});
 
-    // Берём клиента/дату из первой строки задания
     if(!clientMap[num] && client) clientMap[num] = client;
     if(!taskDateMap[num] && tdate) taskDateMap[num] = tdate;
   });
@@ -578,12 +609,14 @@ function openDayMod(key){
 
   var th='';
   d.tasks.forEach(function(t){
-    var cl=t.client||clientMap[t.num]||'—';
+    var cl = t.client || clientMap[t.num] || '—';
     var td = taskDateMap[t.num] ? dfmt(taskDateMap[t.num]) : '—';
+    var ct = t.ct || createTimeMap[t.num] || '—';
 
     th+='<tr class="tr-click" onclick="openTaskMod(\''+t.num+'\')">';
     th+='<td class="task-num-cell">'+t.num+'</td>';
     th+='<td class="date-cell">'+td+'</td>';
+    th+='<td class="date-cell">'+ct+'</td>';
     th+='<td class="client-cell">'+cl+'</td>';
     th+='<td class="date-cell">'+dfmt(t.ds)+'</td>';
     th+='<td class="date-cell">'+dfmt(t.de)+'</td>';
@@ -598,12 +631,15 @@ function openDayMod(key){
 }
 
 function openTaskMod(num){
-  var items=compRows.filter(function(r){return r.num===num;});
-  var client=clientMap[num]||'';
+  var items = compRows.filter(function(r){ return r.num === num; });
+  var client = clientMap[num] || '';
+  var ct = createTimeMap[num] || '—';
 
   var td = taskDateMap[num] ? (' от ' + dfmt(taskDateMap[num])) : '';
-  document.getElementById('t2-num').textContent='Задание № '+num+td;
-  document.getElementById('t2-sub').textContent=(client?client+' · ':'')+'состав заказа';
+  var tt = ct && ct !== '—' ? (' ' + ct) : '';
+
+  document.getElementById('t2-num').textContent = 'Задание № ' + num + td + tt;
+  document.getElementById('t2-sub').textContent = (client ? client + ' · ' : '') + 'состав заказа';
 
   if(items.length===0){
     document.getElementById('t2-summary').innerHTML='';
@@ -652,7 +688,6 @@ function loadData(){
   document.getElementById('loading').style.display='block';
   document.getElementById('grid').innerHTML='';
 
-  // 3-й источник (праздники) — опционально: если GID_HOL пустой, просто не учитываем
   var pH = (GID_HOL && String(GID_HOL).trim())
     ? fetchCSV(GID_HOL).catch(function(){ return ''; })
     : Promise.resolve('');
@@ -663,7 +698,7 @@ function loadData(){
 
       processMain(res[0]);
       processComp(res[1]);
-      processHolidays(res[2]); // если пусто — holidaySet будет {}
+      processHolidays(res[2]);
 
       buildDayMap();
       render();
