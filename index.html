@@ -348,7 +348,36 @@ function tfmt(s){
     var ss = p.length >= 3 ? ':' + ('0' + parseInt(p[2], 10)).slice(-2) : '';
     return hh + ':' + mm + ss;
   }
+function timeToSec(s){
+  s = tfmt(s);
+  if(!s || s === '—') return Number.MAX_SAFE_INTEGER;
 
+  var p = s.split(':');
+  var hh = parseInt(p[0], 10) || 0;
+  var mm = parseInt(p[1], 10) || 0;
+  var ss = parseInt(p[2], 10) || 0;
+
+  return hh * 3600 + mm * 60 + ss;
+}
+
+function sortTasksByCreated(a, b){
+  var ad = taskDateMap[a.num] ? taskDateMap[a.num].getTime() : Number.MAX_SAFE_INTEGER;
+  var bd = taskDateMap[b.num] ? taskDateMap[b.num].getTime() : Number.MAX_SAFE_INTEGER;
+
+  if(ad !== bd) return ad - bd;
+
+  var at = timeToSec(a.ct || createTimeMap[a.num] || '');
+  var bt = timeToSec(b.ct || createTimeMap[b.num] || '');
+
+  if(at !== bt) return at - bt;
+
+  var an = parseInt(a.num, 10);
+  var bn = parseInt(b.num, 10);
+
+  if(!isNaN(an) && !isNaN(bn) && an !== bn) return an - bn;
+
+  return String(a.num).localeCompare(String(b.num), 'ru');
+}
   return s;
 }
 function addDays(d,n){var r=new Date(d);r.setDate(r.getDate()+n);return r;}
@@ -583,50 +612,55 @@ function buildChart(days){
 }
 
 function openDayMod(key){
-  var d=dayMap[key];if(!d)return;
-  var s=getStaff(d.date),nN=s*NORM_N,nG=s*NORM_G;
-  var pn=Math.round(d.names/nN*100),pg=Math.round(d.goods/nG*100);
-  var fN=Math.max(0,nN-d.names),fG=Math.max(0,nG-d.goods);
-  var cn=color(pn);
-  var dd=('0'+d.date.getDate()).slice(-2),mm=('0'+(d.date.getMonth()+1)).slice(-2);
+  var d = dayMap[key];
+  if(!d) return;
 
-  document.getElementById('md').textContent=dd+'.'+mm+'.'+d.date.getFullYear();
-  document.getElementById('mdow').textContent=dow(d.date);
-  document.getElementById('ms').textContent=s;
-  document.getElementById('mt').textContent=d.tasks.length;
-  document.getElementById('mn').textContent=d.names;
-  document.getElementById('mg').textContent=d.goods;
-  document.getElementById('mnn').textContent=nN;
-  document.getElementById('mgn').textContent=nG;
-  document.getElementById('mfn').textContent=fN;
-  document.getElementById('mfg').textContent=fG;
-  document.getElementById('mpn').textContent=pn+'%';
-  document.getElementById('mpn').style.color=cn;
-  document.getElementById('mbn').style.width=Math.min(pn,100)+'%';
-  document.getElementById('mbn').style.background=cn;
-  document.getElementById('mpg').textContent=pg+'%';
-  document.getElementById('mbg').style.width=Math.min(pg,100)+'%';
+  var s = getStaff(d.date), nN = s * NORM_N, nG = s * NORM_G;
+  var pn = Math.round(d.names / nN * 100), pg = Math.round(d.goods / nG * 100);
+  var fN = Math.max(0, nN - d.names), fG = Math.max(0, nG - d.goods);
+  var cn = color(pn);
+  var dd = ('0' + d.date.getDate()).slice(-2), mm = ('0' + (d.date.getMonth() + 1)).slice(-2);
 
-  var th='';
-  d.tasks.forEach(function(t){
+  document.getElementById('md').textContent = dd + '.' + mm + '.' + d.date.getFullYear();
+  document.getElementById('mdow').textContent = dow(d.date);
+  document.getElementById('ms').textContent = s;
+  document.getElementById('mt').textContent = d.tasks.length;
+  document.getElementById('mn').textContent = d.names;
+  document.getElementById('mg').textContent = d.goods;
+  document.getElementById('mnn').textContent = nN;
+  document.getElementById('mgn').textContent = nG;
+  document.getElementById('mfn').textContent = fN;
+  document.getElementById('mfg').textContent = fG;
+  document.getElementById('mpn').textContent = pn + '%';
+  document.getElementById('mpn').style.color = cn;
+  document.getElementById('mbn').style.width = Math.min(pn, 100) + '%';
+  document.getElementById('mbn').style.background = cn;
+  document.getElementById('mpg').textContent = pg + '%';
+  document.getElementById('mbg').style.width = Math.min(pg, 100) + '%';
+
+  var tasksSorted = d.tasks.slice().sort(sortTasksByCreated);
+
+  var th = '';
+  tasksSorted.forEach(function(t){
     var cl = t.client || clientMap[t.num] || '—';
     var td = taskDateMap[t.num] ? dfmt(taskDateMap[t.num]) : '—';
     var ct = t.ct || createTimeMap[t.num] || '—';
 
-    th+='<tr class="tr-click" onclick="openTaskMod(\''+t.num+'\')">';
-    th+='<td class="task-num-cell">'+t.num+'</td>';
-    th+='<td class="date-cell">'+td+'</td>';
-    th+='<td class="date-cell">'+ct+'</td>';
-    th+='<td class="client-cell">'+cl+'</td>';
-    th+='<td class="date-cell">'+dfmt(t.ds)+'</td>';
-    th+='<td class="date-cell">'+dfmt(t.de)+'</td>';
-    th+='<td style="text-align:center;font-weight:700">'+t.names+'</td>';
-    th+='<td style="text-align:center;font-weight:700">'+t.goods+'</td>';
-    th+='<td class="date-cell">'+dfmt(t.dd)+'</td>';
-    th+='<td><button class="open-btn" onclick="event.stopPropagation();openTaskMod(\''+t.num+'\')">Состав →</button></td>';
-    th+='</tr>';
+    th += '<tr class="tr-click" onclick="openTaskMod(\'' + t.num + '\')">';
+    th += '<td class="task-num-cell">' + t.num + '</td>';
+    th += '<td class="date-cell">' + td + '</td>';
+    th += '<td class="date-cell">' + ct + '</td>';
+    th += '<td class="client-cell">' + cl + '</td>';
+    th += '<td class="date-cell">' + dfmt(t.ds) + '</td>';
+    th += '<td class="date-cell">' + dfmt(t.de) + '</td>';
+    th += '<td style="text-align:center;font-weight:700">' + t.names + '</td>';
+    th += '<td style="text-align:center;font-weight:700">' + t.goods + '</td>';
+    th += '<td class="date-cell">' + dfmt(t.dd) + '</td>';
+    th += '<td><button class="open-btn" onclick="event.stopPropagation();openTaskMod(\'' + t.num + '\')">Состав →</button></td>';
+    th += '</tr>';
   });
-  document.getElementById('m-tasks-body').innerHTML=th;
+
+  document.getElementById('m-tasks-body').innerHTML = th;
   document.getElementById('overlay').classList.add('on');
 }
 
