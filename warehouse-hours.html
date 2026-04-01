@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Загрузка склада по часам</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d0f14;color:#e8eaf0;font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-size:14px}
+
+header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.logo{font-size:17px;font-weight:900;color:#4fc3f7;letter-spacing:1px}
+.sub{font-size:11px;color:#9ca3af;margin-top:2px}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#00e676;margin-right:5px}
+.dot.err{background:#ff3d57}
+.dot.loading{background:#ffea00;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+.toolbar{padding:10px 16px;background:#161920;border-bottom:1px solid #252830;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pill{padding:5px 13px;border:1px solid #252830;background:transparent;color:#9ca3af;font-size:11px;font-weight:700;border-radius:20px;cursor:pointer;transition:all 0.15s}
+.pill.on{background:#4fc3f7;color:#000;border-color:#4fc3f7}
+.pill.del{border-color:#7c4dff44}
+.pill.del.on{background:#7c4dff;color:#fff;border-color:#7c4dff}
+.sep{width:1px;height:20px;background:#252830;margin:0 4px}
+.cache-badge{font-size:10px;color:#6b7280;padding:4px 8px;background:#1a1d24;border-radius:4px;border:1px solid #252830}
+.refresh-btn{padding:5px 13px;background:#252830;border:none;color:#4fc3f7;font-size:11px;font-weight:700;border-radius:20px;cursor:pointer}
+.refresh-btn:hover{background:#2d3244}
+
+.main{padding:14px 16px}
+
+/* SUMMARY CARDS */
+.summary{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.si{flex:1;min-width:100px;background:#161920;border:1px solid #252830;border-radius:6px;padding:10px;text-align:center}
+.sn{font-size:22px;font-weight:900;line-height:1}
+.sd{font-size:10px;color:#9ca3af;margin-top:3px}
+
+/* HEATMAP */
+.section{background:#161920;border:1px solid #252830;border-radius:8px;padding:16px;margin-bottom:14px}
+.section-title{font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px}
+.heatmap-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.heatmap{display:grid;gap:2px}
+.hm-row{display:flex;align-items:center;gap:2px}
+.hm-label{font-size:10px;color:#6b7280;width:56px;flex-shrink:0;text-align:right;padding-right:6px;white-space:nowrap}
+.hm-cell{width:30px;height:28px;border-radius:3px;cursor:pointer;transition:transform 0.1s;position:relative;flex-shrink:0}
+.hm-cell:hover{transform:scale(1.15);z-index:10}
+.hm-cell-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:rgba(0,0,0,0.75)}
+.hm-hour-labels{display:flex;gap:2px;margin-left:62px;margin-bottom:4px}
+.hm-hlabel{width:30px;text-align:center;font-size:9px;color:#6b7280;flex-shrink:0}
+.hm-legend{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+.hm-leg-title{font-size:10px;color:#6b7280}
+.hm-leg-scale{display:flex;gap:2px;align-items:center}
+.hm-leg-cell{width:16px;height:16px;border-radius:2px}
+.hm-leg-label{font-size:9px;color:#6b7280}
+
+/* BAR CHART — часы суммарно */
+.bar-wrap{display:flex;flex-direction:column;gap:4px}
+.bar-row{display:flex;align-items:center;gap:8px;cursor:pointer}
+.bar-row:hover .bar-fill{filter:brightness(1.2)}
+.bar-label{font-size:11px;color:#9ca3af;width:44px;text-align:right;flex-shrink:0}
+.bar-bg{flex:1;height:24px;background:#1d2028;border-radius:3px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:700;color:rgba(0,0,0,0.8);white-space:nowrap;transition:width 0.4s}
+.bar-val{font-size:11px;font-weight:700;width:42px;text-align:right;flex-shrink:0}
+
+/* DRILL DOWN */
+.breadcrumb{font-size:12px;color:#6b7280;margin-bottom:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.breadcrumb a{color:#4fc3f7;cursor:pointer;font-weight:700}
+.breadcrumb a:hover{text-decoration:underline}
+
+/* TASK LIST POPUP */
+.popup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:299;align-items:flex-end;justify-content:center}
+.popup-overlay.on{display:flex}
+.popup{background:#161920;border-radius:12px 12px 0 0;padding:20px;width:100%;max-height:82vh;overflow-y:auto}
+.popup-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.popup-title{font-size:18px;font-weight:900}
+.popup-close{background:none;border:none;color:#6b7280;font-size:22px;cursor:pointer}
+.tasks-table{width:100%;border-collapse:collapse;font-size:12px}
+.tasks-table th{text-align:left;font-size:10px;color:#6b7280;font-weight:600;padding:6px 8px;border-bottom:1px solid #252830;white-space:nowrap}
+.tasks-table td{padding:8px;border-bottom:1px solid #1a1d24;vertical-align:middle}
+.tasks-table tr:last-child td{border-bottom:none}
+.num-cell{font-weight:700;color:#4fc3f7;white-space:nowrap}
+.del-cell{color:#b39ddb;font-size:11px}
+.date-cell{color:#9ca3af;font-size:11px;white-space:nowrap}
+
+.loading-msg{text-align:center;padding:40px;color:#6b7280;font-size:13px}
+.err-box{background:#1a0f10;border:1px solid #ff3d57;border-radius:6px;padding:14px;font-size:12px;color:#ff8a80;line-height:1.7}
+.empty{padding:24px;text-align:center;color:#6b7280;font-size:12px}
+
+/* MONTH/DAY GRID */
+.m-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.m-card{background:#0d0f14;border:1px solid #252830;border-radius:7px;padding:12px;cursor:pointer;border-top:3px solid #4fc3f7;transition:transform 0.1s}
+.m-card:hover{transform:translateY(-2px)}
+.m-card-title{font-size:18px;font-weight:900;margin-bottom:2px}
+.m-card-sub{font-size:10px;color:#9ca3af;margin-bottom:8px}
+.m-card-stat{font-size:11px;color:#e8eaf0;margin-bottom:3px}
+.m-card-peak{font-size:10px;color:#ffea00;margin-top:6px}
+
+.d-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px}
+.d-card{background:#0d0f14;border:1px solid #252830;border-radius:6px;padding:10px;cursor:pointer;transition:transform 0.1s}
+.d-card:hover{transform:translateY(-2px);border-color:#4fc3f7}
+.d-card-date{font-size:16px;font-weight:900}
+.d-card-dow{font-size:9px;color:#9ca3af;margin-bottom:5px}
+.d-card-tasks{font-size:11px;color:#9ca3af}
+.d-card-peak{font-size:10px;color:#ffea00;margin-top:4px}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">📊 ЗАГРУЗКА ПО ЧАСАМ</div>
+    <div class="sub">МОНИТОРИНГ ЧАСОВОЙ ИНТЕНСИВНОСТИ СКЛАДА</div>
+  </div>
+  <div style="font-size:11px;color:#6b7280;text-align:right;display:flex;align-items:center;gap:8px">
+    <span class="cache-badge" id="cache-info">—</span>
+    <span><span class="dot loading" id="dot"></span><span id="upd-time">Загрузка...</span></span>
+  </div>
+</header>
+
+<div class="toolbar">
+  <span style="font-size:11px;color:#4fc3f7;font-weight:700">Период:</span>
+  <button class="pill on" id="fp-all"   onclick="setPeriod('all')">Всё время</button>
+  <button class="pill"    id="fp-month" onclick="setPeriod('month')">Этот месяц</button>
+  <button class="pill"    id="fp-week"  onclick="setPeriod('week')">7 дней</button>
+  <div class="sep"></div>
+  <div id="delivery-pills" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+    <span style="font-size:11px;color:#4fc3f7;font-weight:700">Доставка:</span>
+  </div>
+  <div class="sep"></div>
+  <button class="refresh-btn" onclick="loadFresh()">↻ Обновить</button>
+</div>
+
+<div class="main">
+  <div class="summary">
+    <div class="si"><div class="sn" id="s-total">—</div><div class="sd">заданий всего</div></div>
+    <div class="si"><div class="sn" id="s-days">—</div><div class="sd">рабочих дней</div></div>
+    <div class="si"><div class="sn" style="color:#ffea00" id="s-peak-hour">—</div><div class="sd">час-пик</div></div>
+    <div class="si"><div class="sn" style="color:#00e676" id="s-avg">—</div><div class="sd">сред/день</div></div>
+  </div>
+
+  <!-- HEATMAP -->
+  <div class="section" id="heatmap-section">
+    <div class="section-title">Тепловая карта — дни × часы</div>
+    <div class="heatmap-wrap" id="heatmap-wrap">
+      <div class="loading-msg">⏳ Загрузка...</div>
+    </div>
+  </div>
+
+  <!-- BAR CHART (drill) -->
+  <div class="section">
+    <div class="section-title" id="bar-title">Загрузка по часам — суммарно</div>
+    <div class="breadcrumb" id="breadcrumb"></div>
+    <div id="bar-content"><div class="loading-msg">⏳ Загрузка...</div></div>
+  </div>
+</div>
+
+<!-- POPUP -->
+<div class="popup-overlay" id="popup" onclick="if(event.target===this)closePopup()">
+  <div class="popup">
+    <div class="popup-hdr">
+      <div class="popup-title" id="popup-title"></div>
+      <button class="popup-close" onclick="closePopup()">✕</button>
+    </div>
+    <div id="popup-body"></div>
+  </div>
+</div>
+
+<script>
+var SHEET_ID = '1UC9fKZo9B87MTCyRaOaO8_ydEdWmFGc1NwcOn2790vg';
+var GID      = '1440282364';
+var CACHE_KEY = 'wh_hours_cache';
+var CACHE_TTL = 60 * 60 * 1000; // 1 час
+
+var allRows    = [];  // {num, date, dateKey, monthKey, hour, delivery}
+var activePeriod   = 'all';
+var activeDelivery = '__all__';
+var drillLevel = 'top';   // 'top' | 'month' | 'day'
+var drillMonth = null;    // 'YYYY-MM'
+var drillDay   = null;    // 'YYYY-MM-DD'
+
+var MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь',
+              'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+var MONTHS_SHORT = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+var DOW = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+
+/* ===================== DATA LOADING ===================== */
+
+function loadFresh(){
+  setStatus('loading','Обновление...');
+  fetchSheet().then(function(txt){
+    processCSV(txt);
+    saveCache(txt);
+    setStatus('ok','Обновлено ' + timeNow());
+    render();
+  }).catch(handleError);
+}
+
+function loadData(){
+  // 1. Показываем кэш мгновенно
+  var cached = getCache();
+  if(cached){
+    processCSV(cached.txt);
+    setStatus('ok','Из кэша · ' + cached.time);
+    document.getElementById('cache-info').textContent = 'Кэш: ' + cached.time;
+    render();
+  } else {
+    setStatus('loading','Загрузка...');
+  }
+  // 2. Тихо обновляем с сервера
+  fetchSheet().then(function(txt){
+    processCSV(txt);
+    saveCache(txt);
+    setStatus('ok','Обновлено ' + timeNow());
+    document.getElementById('cache-info').textContent = 'Кэш обновлён ' + timeNow();
+    render();
+  }).catch(function(e){
+    if(!allRows.length) handleError(e);
+    else document.getElementById('upd-time').textContent = 'Ошибка обновления (показан кэш)';
+  });
+}
+
+function fetchSheet(){
+  var url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID +
+            '/export?format=csv&gid=' + GID + '&t=' + Date.now();
+  return fetch(url).then(function(r){
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    return r.text();
+  });
+}
+
+function saveCache(txt){
+  try{
+    localStorage.setItem(CACHE_KEY, JSON.stringify({txt:txt, ts:Date.now(), time:timeNow()}));
+  }catch(e){}
+}
+
+function getCache(){
+  try{
+    var raw = localStorage.getItem(CACHE_KEY);
+    if(!raw) return null;
+    var obj = JSON.parse(raw);
+    if(Date.now() - obj.ts > CACHE_TTL) return null;
+    return obj;
+  }catch(e){ return null; }
+}
+
+function handleError(e){
+  setStatus('err','Ошибка');
+  var msg = '<div class="err-box">⚠️ Не удалось загрузить данные.<br>' + e.message +
+    '<br><br>Убедитесь что таблица открыта для чтения:<br>' +
+    '<b>Файл → Доступ → Все у кого есть ссылка → Читатель</b></div>';
+  document.getElementById('heatmap-wrap').innerHTML = msg;
+  document.getElementById('bar-content').innerHTML = '';
+}
+
+function setStatus(state, text){
+  var dot = document.getElementById('dot');
+  dot.className = 'dot' + (state==='err'?' err':state==='loading'?' loading':'');
+  document.getElementById('upd-time').textContent = text;
+}
+
+function timeNow(){
+  var n = new Date();
+  return ('0'+n.getHours()).slice(-2)+':'+('0'+n.getMinutes()).slice(-2);
+}
+
+/* ===================== CSV PARSING ===================== */
+
+function parseCSV(txt){
+  var lines = txt.split(/\r?\n/), rows = [];
+  for(var i=1;i<lines.length;i++){
+    var line=lines[i].trim(); if(!line) continue;
+    var cols=[],inq=false,cur='';
+    for(var j=0;j<line.length;j++){
+      var ch=line[j];
+      if(ch==='"'){inq=!inq;}
+      else if(ch===','&&!inq){cols.push(cur);cur='';}
+      else cur+=ch;
+    }
+    cols.push(cur);
+    rows.push(cols.map(function(c){return (c||'').trim();}));
+  }
+  return rows;
+}
+
+function parseDate(s){
+  if(!s) return null;
+  s=s.trim();
+  var p;
+  if(/^\d{2}\.\d{2}\.\d{4}$/.test(s)){p=s.split('.');return new Date(+p[2],+p[1]-1,+p[0]);}
+  if(/^\d{4}-\d{2}-\d{2}/.test(s)){p=s.slice(0,10).split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
+  var d=new Date(s); return isNaN(d)?null:d;
+}
+
+function parseHour(s){
+  if(!s) return null;
+  var m=s.match(/(\d{1,2}):(\d{2})/);
+  if(!m) return null;
+  var h=parseInt(m[1],10);
+  return (h>=0&&h<=23)?h:null;
+}
+
+function dkey(d){
+  return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+}
+function mkey(d){
+  return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2);
+}
+
+function processCSV(txt){
+  var rows = parseCSV(txt);
+  allRows = [];
+  rows.forEach(function(c){
+    var num      = c[0];
+    var dateRaw  = c[6];   // G
+    var timeRaw  = c[7];   // H
+    var delivery = (c[8]||'').trim() || '—';
+    if(!num||!dateRaw||!timeRaw) return;
+    var d = parseDate(dateRaw);
+    if(!d) return;
+    var hour = parseHour(timeRaw);
+    if(hour===null) return;
+    allRows.push({
+      num:num, date:d,
+      dateKey:dkey(d), monthKey:mkey(d),
+      hour:hour, delivery:delivery
+    });
+  });
+  buildDeliveryPills();
+}
+
+/* ===================== FILTERS ===================== */
+
+function getFiltered(){
+  var now = new Date(); now.setHours(0,0,0,0);
+  return allRows.filter(function(r){
+    if(activePeriod==='month'){
+      var n=new Date(); if(r.date.getFullYear()!==n.getFullYear()||r.date.getMonth()!==n.getMonth()) return false;
+    } else if(activePeriod==='week'){
+      var diff=(now-r.date)/86400000; if(diff<0||diff>7) return false;
+    }
+    if(activeDelivery!=='__all__'&&r.delivery!==activeDelivery) return false;
+    return true;
+  });
+}
+
+function setPeriod(p){
+  activePeriod=p;
+  ['all','month','week'].forEach(function(v){
+    document.getElementById('fp-'+v).className='pill'+(v===p?' on':'');
+  });
+  drillLevel='top'; drillMonth=null; drillDay=null;
+  render();
+}
+
+function setDelivery(d){
+  activeDelivery=d; buildDeliveryPills();
+  drillLevel='top'; drillMonth=null; drillDay=null;
+  render();
+}
+
+function buildDeliveryPills(){
+  var types={};
+  allRows.forEach(function(r){types[r.delivery]=true;});
+  var wrap=document.getElementById('delivery-pills');
+  var html='<span style="font-size:11px;color:#4fc3f7;font-weight:700">Доставка:</span>';
+  html+='<button class="pill del'+(activeDelivery==='__all__'?' on':'')+'" onclick="setDelivery(\'__all__\')">Все</button>';
+  Object.keys(types).sort().forEach(function(t){
+    var on=activeDelivery===t?' on':'';
+    html+='<button class="pill del'+on+'" onclick="setDelivery(\''+t.replace(/'/g,"\\'")+'\')">' + t + '</button>';
+  });
+  wrap.innerHTML=html;
+}
+
+/* ===================== RENDER ===================== */
+
+function render(){
+  var rows=getFiltered();
+  renderSummary(rows);
+  renderHeatmap(rows);
+  renderBarDrill(rows);
+}
+
+/* ---- SUMMARY ---- */
+function renderSummary(rows){
+  var days={};
+  var hours=new Array(24).fill(0);
+  rows.forEach(function(r){days[r.dateKey]=true; hours[r.hour]++;});
+  var dayCount=Object.keys(days).length;
+  var peakH=hours.indexOf(Math.max.apply(null,hours));
+  var avg=dayCount>0?Math.round(rows.length/dayCount):0;
+  document.getElementById('s-total').textContent=rows.length;
+  document.getElementById('s-days').textContent=dayCount;
+  document.getElementById('s-peak-hour').textContent=('0'+peakH).slice(-2)+':00';
+  document.getElementById('s-avg').textContent=avg;
+}
+
+/* ---- HEATMAP ---- */
+function renderHeatmap(rows){
+  // Строки = уникальные дни, столбцы = часы 0-23
+  var days={};
+  rows.forEach(function(r){
+    if(!days[r.dateKey]) days[r.dateKey]={date:r.date,hours:new Array(24).fill(0)};
+    days[r.dateKey].hours[r.hour]++;
+  });
+  var dayKeys=Object.keys(days).sort();
+  if(!dayKeys.length){
+    document.getElementById('heatmap-wrap').innerHTML='<div class="empty">Нет данных</div>';
+    return;
+  }
+
+  // Если дней слишком много — группируем по неделям или показываем только последние 60
+  var showKeys = dayKeys;
+  if(dayKeys.length > 60) showKeys = dayKeys.slice(-60);
+
+  var maxVal=0;
+  showKeys.forEach(function(k){
+    days[k].hours.forEach(function(v){if(v>maxVal)maxVal=v;});
+  });
+
+  function cellColor(v){
+    if(v===0) return '#1d2028';
+    var t=v/maxVal;
+    if(t<0.25) return '#1a3a2a';
+    if(t<0.5)  return '#1a6b3a';
+    if(t<0.75) return '#e6a817';
+    return '#ff3d57';
+  }
+
+  // Hour labels
+  var hlHtml='<div class="hm-hour-labels">';
+  for(var h=0;h<24;h++) hlHtml+='<div class="hm-hlabel">'+('0'+h).slice(-2)+'</div>';
+  hlHtml+='</div>';
+
+  var rowsHtml='';
+  showKeys.forEach(function(k){
+    var d=days[k].date;
+    var label=('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+' '+DOW[d.getDay()];
+    rowsHtml+='<div class="hm-row">';
+    rowsHtml+='<div class="hm-label">'+label+'</div>';
+    for(var h2=0;h2<24;h2++){
+      var v=days[k].hours[h2];
+      var col=cellColor(v);
+      var dk2=k, hh=h2;
+      rowsHtml+='<div class="hm-cell" style="background:'+col+'" title="'+label+' '+('0'+hh).slice(-2)+':00 — '+v+' зад." onclick="showPopup(\''+dk2+'\','+hh+')">';
+      if(v>0) rowsHtml+='<div class="hm-cell-val">'+v+'</div>';
+      rowsHtml+='</div>';
+    }
+    rowsHtml+='</div>';
+  });
+
+  var legend='<div class="hm-legend"><span class="hm-leg-title">Интенсивность:</span><div class="hm-leg-scale">'+
+    '<div class="hm-leg-cell" style="background:#1d2028"></div>'+
+    '<div class="hm-leg-label">0</div>'+
+    '<div class="hm-leg-cell" style="background:#1a3a2a"></div>'+
+    '<div class="hm-leg-cell" style="background:#1a6b3a"></div>'+
+    '<div class="hm-leg-label">низкая</div>'+
+    '<div class="hm-leg-cell" style="background:#e6a817"></div>'+
+    '<div class="hm-leg-label">высокая</div>'+
+    '<div class="hm-leg-cell" style="background:#ff3d57"></div>'+
+    '<div class="hm-leg-label">пик</div>'+
+    '</div>';
+  if(dayKeys.length>60) legend+='<span style="font-size:10px;color:#6b7280">Показаны последние 60 дней из '+dayKeys.length+'</span>';
+  legend+='</div>';
+
+  document.getElementById('heatmap-wrap').innerHTML = hlHtml + rowsHtml + legend;
+}
+
+/* ---- BAR DRILL ---- */
+function renderBarDrill(rows){
+  if(drillLevel==='top') renderBarMonths(rows);
+  else if(drillLevel==='month') renderBarDays(rows);
+  else renderBarHours(rows);
+  renderBreadcrumb();
+}
+
+function renderBarMonths(rows){
+  document.getElementById('bar-title').textContent='Загрузка по месяцам — нажмите для детализации';
+  var mmap={};
+  rows.forEach(function(r){
+    if(!mmap[r.monthKey]) mmap[r.monthKey]={key:r.monthKey,date:r.date,count:0,hours:new Array(24).fill(0)};
+    mmap[r.monthKey].count++;
+    mmap[r.monthKey].hours[r.hour]++;
+  });
+  var months=Object.values(mmap).sort(function(a,b){return a.key>b.key?1:-1;});
+  if(!months.length){document.getElementById('bar-content').innerHTML='<div class="empty">Нет данных</div>';return;}
+  var maxC=Math.max.apply(null,months.map(function(m){return m.count;}));
+
+  var html='<div class="m-grid">';
+  months.forEach(function(m){
+    var peak=m.hours.indexOf(Math.max.apply(null,m.hours));
+    var p=m.key.split('-');
+    html+='<div class="m-card" onclick="drillToMonth(\''+m.key+'\')">';
+    html+='<div class="m-card-title">'+MONTHS_SHORT[parseInt(p[1],10)-1]+'</div>';
+    html+='<div class="m-card-sub">'+p[0]+'</div>';
+    html+='<div class="m-card-stat">📦 '+m.count+' заданий</div>';
+    var bar=Math.round(m.count/maxC*100);
+    html+='<div style="margin-top:6px;height:4px;background:#252830;border-radius:2px"><div style="height:100%;width:'+bar+'%;background:#4fc3f7;border-radius:2px"></div></div>';
+    html+='<div class="m-card-peak">Пик: '+('0'+peak).slice(-2)+':00</div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  document.getElementById('bar-content').innerHTML=html;
+}
+
+function renderBarDays(rows){
+  document.getElementById('bar-title').textContent='Дни месяца — нажмите для детализации по часам';
+  var filtered=rows.filter(function(r){return r.monthKey===drillMonth;});
+  var dmap={};
+  filtered.forEach(function(r){
+    if(!dmap[r.dateKey]) dmap[r.dateKey]={key:r.dateKey,date:r.date,count:0,hours:new Array(24).fill(0)};
+    dmap[r.dateKey].count++;
+    dmap[r.dateKey].hours[r.hour]++;
+  });
+  var days2=Object.values(dmap).sort(function(a,b){return a.key>b.key?1:-1;});
+  if(!days2.length){document.getElementById('bar-content').innerHTML='<div class="empty">Нет данных за этот месяц</div>';return;}
+
+  var html='<div class="d-grid">';
+  days2.forEach(function(d){
+    var peak=d.hours.indexOf(Math.max.apply(null,d.hours));
+    var dd=('0'+d.date.getDate()).slice(-2);
+    html+='<div class="d-card" onclick="drillToDay(\''+d.key+'\')">';
+    html+='<div class="d-card-date">'+dd+'</div>';
+    html+='<div class="d-card-dow">'+DOW[d.date.getDay()]+'</div>';
+    html+='<div class="d-card-tasks">📦 '+d.count+'</div>';
+    html+='<div class="d-card-peak">Пик: '+('0'+peak).slice(-2)+':00</div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  document.getElementById('bar-content').innerHTML=html;
+}
+
+function renderBarHours(rows){
+  var dayLabel = drillDay ? drillDay.split('-').reverse().join('.') : '—';
+  document.getElementById('bar-title').textContent='Часовой профиль — ' + dayLabel;
+  var filtered=rows.filter(function(r){return r.dateKey===drillDay;});
+  var hours=new Array(24).fill(0);
+  var tasksByHour=[];
+  for(var i=0;i<24;i++) tasksByHour.push([]);
+  filtered.forEach(function(r){hours[r.hour]++;tasksByHour[r.hour].push(r);});
+  var maxH=Math.max.apply(null,hours)||1;
+
+  function barColor(v,mx){
+    var t=v/mx;
+    if(t===0) return '#252830';
+    if(t<0.34) return '#00e676';
+    if(t<0.67) return '#ffea00';
+    return '#ff3d57';
+  }
+
+  var html='<div class="bar-wrap">';
+  for(var h=0;h<24;h++){
+    var cnt=hours[h];
+    var pct=maxH>0?(cnt/maxH*100):0;
+    var col=barColor(cnt,maxH);
+    html+='<div class="bar-row" onclick="showPopup(\''+drillDay+'\','+h+')">';
+    html+='<div class="bar-label">'+('0'+h).slice(-2)+':00</div>';
+    html+='<div class="bar-bg"><div class="bar-fill" style="width:'+Math.max(pct,0)+'%;background:'+col+'">';
+    if(cnt>0&&pct>12) html+=cnt+' зад.';
+    html+='</div></div>';
+    html+='<div class="bar-val" style="color:'+(cnt>0?col:'#4b5563')+'">'+( cnt||''  )+'</div>';
+    html+='</div>';
+  }
+  html+='</div>';
+  document.getElementById('bar-content').innerHTML=html;
+}
+
+/* ---- BREADCRUMB ---- */
+function renderBreadcrumb(){
+  var bc='';
+  if(drillLevel==='top'){
+    bc='<span style="color:#4fc3f7;font-weight:700">Все месяцы</span>';
+  } else if(drillLevel==='month'){
+    var mp=drillMonth.split('-');
+    bc='<a onclick="goTop()">Все месяцы</a> <span>›</span> <span style="color:#e8eaf0">'+MONTHS[parseInt(mp[1],10)-1]+' '+mp[0]+'</span>';
+  } else {
+    var mp2=drillMonth.split('-');
+    var dp=drillDay.split('-');
+    bc='<a onclick="goTop()">Все месяцы</a> <span>›</span> <a onclick="drillToMonth(\''+drillMonth+'\')">'+MONTHS[parseInt(mp2[1],10)-1]+' '+mp2[0]+'</a> <span>›</span> <span style="color:#e8eaf0">'+dp[2]+'.'+dp[1]+'.'+dp[0]+'</span>';
+  }
+  document.getElementById('breadcrumb').innerHTML=bc;
+}
+
+/* ---- DRILL ---- */
+function goTop(){drillLevel='top';drillMonth=null;drillDay=null;renderBarDrill(getFiltered());}
+function drillToMonth(mk){drillLevel='month';drillMonth=mk;drillDay=null;renderBarDrill(getFiltered());}
+function drillToDay(dk){
+  var mk=dk.slice(0,7);
+  drillLevel='day';drillMonth=mk;drillDay=dk;renderBarDrill(getFiltered());
+}
+
+/* ---- POPUP ---- */
+function showPopup(dateKey, hour){
+  var rows=getFiltered().filter(function(r){return r.dateKey===dateKey&&r.hour===hour;});
+  if(!rows.length) return;
+  var dp=dateKey.split('-');
+  var label=dp[2]+'.'+dp[1]+'.'+dp[0]+' · '+('0'+hour).slice(-2)+':00–'+('0'+hour).slice(-2)+':59';
+  document.getElementById('popup-title').textContent='🕐 '+label+' — '+rows.length+' зад.';
+  var html='<div style="overflow-x:auto"><table class="tasks-table"><thead><tr>'+
+    '<th>№ задания</th><th>Дата сборки</th><th>Время</th><th>Тип доставки</th>'+
+    '</tr></thead><tbody>';
+  rows.sort(function(a,b){return parseInt(a.num)-parseInt(b.num);}).forEach(function(r){
+    var dd=('0'+r.date.getDate()).slice(-2)+'.'+('0'+(r.date.getMonth()+1)).slice(-2)+'.'+r.date.getFullYear();
+    html+='<tr><td class="num-cell">'+r.num+'</td>'+
+      '<td class="date-cell">'+dd+'</td>'+
+      '<td class="date-cell">'+('0'+r.hour).slice(-2)+':xx</td>'+
+      '<td class="del-cell">'+r.delivery+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+  document.getElementById('popup-body').innerHTML=html;
+  document.getElementById('popup').classList.add('on');
+}
+function closePopup(){document.getElementById('popup').classList.remove('on');}
+
+/* ===================== INIT ===================== */
+loadData();
+setInterval(function(){
+  fetchSheet().then(function(txt){
+    processCSV(txt); saveCache(txt);
+    setStatus('ok','Обновлено '+timeNow());
+    document.getElementById('cache-info').textContent='Кэш обновлён '+timeNow();
+    render();
+  }).catch(function(){});
+}, 60*60*1000);
+</script>
+</body>
+</html>
