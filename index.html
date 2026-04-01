@@ -115,6 +115,41 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
 .loading{text-align:center;padding:40px 16px;color:#6b7280;font-size:13px}
 .err-box{background:#1a0f10;border:1px solid #ff3d57;border-radius:6px;padding:14px;font-size:12px;color:#ff8a80;line-height:1.7}
 
+/* === HOURLY CHART === */
+.hc-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.hc-filter-label{font-size:11px;color:#4fc3f7;font-weight:700;margin-right:4px}
+.hc-pill{padding:5px 11px;border:1px solid #252830;background:transparent;color:#6b7280;font-size:11px;font-weight:700;border-radius:20px;cursor:pointer;transition:all 0.15s}
+.hc-pill.on{background:#4fc3f7;color:#000;border-color:#4fc3f7}
+.hc-pill.del{background:#7c4dff22;color:#b39ddb;border-color:#7c4dff}
+.hc-pill.del.on{background:#7c4dff;color:#fff;border-color:#7c4dff}
+.hc-breadcrumb{font-size:12px;color:#6b7280;margin-bottom:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.hc-breadcrumb a{color:#4fc3f7;cursor:pointer;text-decoration:none;font-weight:700}
+.hc-breadcrumb a:hover{text-decoration:underline}
+.hc-breadcrumb span{color:#6b7280}
+.hc-bar-wrap{display:flex;flex-direction:column;gap:3px}
+.hc-row{display:flex;align-items:center;gap:8px;cursor:pointer;padding:3px 0}
+.hc-row:hover .hc-bar-fill{filter:brightness(1.2)}
+.hc-row-label{font-size:11px;color:#9ca3af;width:44px;text-align:right;flex-shrink:0}
+.hc-bar-bg{flex:1;height:22px;background:#1d2028;border-radius:3px;overflow:hidden;position:relative}
+.hc-bar-fill{height:100%;border-radius:3px;transition:width 0.3s;display:flex;align-items:center;padding-left:6px;font-size:10px;font-weight:700;color:rgba(0,0,0,0.8);white-space:nowrap}
+.hc-bar-val{font-size:11px;font-weight:700;width:36px;text-align:right;flex-shrink:0}
+.hc-month-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.hc-month-card{background:#161920;border:1px solid #252830;border-radius:7px;padding:12px;cursor:pointer;transition:transform 0.1s;border-top:3px solid #4fc3f7}
+.hc-month-card:active{transform:scale(0.97)}
+.hc-month-card:hover{border-color:#4fc3f7}
+.hc-mc-title{font-size:18px;font-weight:900;margin-bottom:2px}
+.hc-mc-sub{font-size:10px;color:#9ca3af;margin-bottom:8px}
+.hc-mc-stat{font-size:12px;color:#e8eaf0;margin-bottom:2px}
+.hc-day-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px}
+.hc-day-card{background:#161920;border:1px solid #252830;border-radius:6px;padding:10px;cursor:pointer;transition:transform 0.1s}
+.hc-day-card:active{transform:scale(0.97)}
+.hc-day-card:hover{border-color:#4fc3f7}
+.hc-dc-date{font-size:16px;font-weight:900}
+.hc-dc-dow{font-size:9px;color:#9ca3af;margin-bottom:5px}
+.hc-dc-tasks{font-size:11px;color:#9ca3af}
+.hc-dc-peak{font-size:10px;color:#4fc3f7;margin-top:4px}
+.hc-empty{padding:30px;text-align:center;color:#6b7280;font-size:13px}
+
 /* === Осветляем "серый" текст для читаемости === */
 :root{ --muted:#9ca3af; }
 .sub, .settings label, .sd, .tb, .cdow, .ctasks, .pct-sub,
@@ -188,6 +223,7 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
   <div class="toggle">
     <button class="tb on" id="btn-cards" onclick="setView('cards')">КАРТОЧКИ</button>
     <button class="tb" id="btn-chart" onclick="setView('chart')">ГРАФИК</button>
+    <button class="tb" id="btn-hourly" onclick="setView('hourly')">ПО ЧАСАМ</button>
   </div>
 
   <div id="view-cards">
@@ -212,6 +248,24 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
         <div class="li"><div class="ld" style="background:#7c4dff"></div>% по товарам</div>
         <div class="li"><div class="ld" style="border:1px dashed rgba(255,255,255,0.3)"></div>100% норма</div>
       </div>
+    </div>
+  </div>
+
+  <!-- HOURLY VIEW -->
+  <div id="view-hourly" style="display:none">
+    <div class="chart-box">
+      <div class="hc-filters">
+        <span class="hc-filter-label">Период:</span>
+        <button class="hc-pill on" id="hf-period-all" onclick="hcSetPeriod('all')">Всё время</button>
+        <button class="hc-pill" id="hf-period-month" onclick="hcSetPeriod('month')">Текущий месяц</button>
+        <button class="hc-pill" id="hf-period-week" onclick="hcSetPeriod('week')">7 дней</button>
+      </div>
+      <div class="hc-filters" id="hc-delivery-filters">
+        <span class="hc-filter-label">Тип доставки:</span>
+        <button class="hc-pill del on" id="hf-del-__all__" onclick="hcSetDelivery('__all__')">Все</button>
+      </div>
+      <div class="hc-breadcrumb" id="hc-breadcrumb"></div>
+      <div id="hc-content"><div class="hc-empty">⏳ Загрузка данных...</div></div>
     </div>
   </div>
 </div>
@@ -814,6 +868,361 @@ function loadData(){
 
 loadData();
 setInterval(loadData, 60 * 60 * 1000);
+
+/* ============================================================
+   HOURLY CHART — график загрузки по часам
+   Данные из отдельной таблицы: колонки
+   A=№задания, G=Дата сборки задания, H=Время сборки задания, I=Тип доставки
+   ============================================================ */
+
+var HC_SHEET_ID = '1UC9fKZo9B87MTCyRaOaO8_ydEdWmFGc1NwcOn2790vg';
+var HC_GID      = '1440282364';
+
+var hcRows      = [];   // [{num, date, hour, delivery}]
+var hcPeriod    = 'all';
+var hcDelivery  = '__all__';
+var hcLevel     = 'months';   // 'months' | 'days' | 'hours'
+var hcSelMonth  = null;  // 'YYYY-MM'
+var hcSelDay    = null;  // 'YYYY-MM-DD'
+
+var MONTHS_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь',
+                 'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+
+function hcFetch(){
+  var url = 'https://docs.google.com/spreadsheets/d/' + HC_SHEET_ID +
+            '/export?format=csv&gid=' + HC_GID;
+  document.getElementById('hc-content').innerHTML = '<div class="hc-empty">⏳ Загружаем данные по часам...</div>';
+  fetch(url)
+    .then(function(r){
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    })
+    .then(function(txt){
+      hcProcess(txt);
+      hcBuildDeliveryFilters();
+      hcRender();
+    })
+    .catch(function(e){
+      document.getElementById('hc-content').innerHTML =
+        '<div class="err-box">⚠️ Не удалось загрузить данные по часам.<br>' + e.message +
+        '<br><br>Убедитесь что таблица открыта для чтения всем у кого есть ссылка.</div>';
+    });
+}
+
+function hcProcess(txt){
+  var lines = txt.split(/\r?\n/);
+  hcRows = [];
+  for(var i = 1; i < lines.length; i++){
+    var line = lines[i].trim();
+    if(!line) continue;
+    var cols = hcParseCSVLine(line);
+    var num      = (cols[0] || '').trim();
+    var dateRaw  = (cols[6] || '').trim();   // G — Дата сборки задания
+    var timeRaw  = (cols[7] || '').trim();   // H — Время сборки задания
+    var delivery = (cols[8] || '').trim();   // I — Тип доставки
+    if(!num || !dateRaw || !timeRaw) continue;
+    var d = parseDate(dateRaw);
+    if(!d) continue;
+    var hour = hcParseHour(timeRaw);
+    if(hour === null) continue;
+    hcRows.push({
+      num: num,
+      date: d,
+      hour: hour,
+      delivery: delivery || '—'
+    });
+  }
+}
+
+function hcParseCSVLine(line){
+  var cols = [], inq = false, cur = '';
+  for(var j = 0; j < line.length; j++){
+    var ch = line[j];
+    if(ch === '"'){ inq = !inq; }
+    else if(ch === ',' && !inq){ cols.push(cur); cur = ''; }
+    else cur += ch;
+  }
+  cols.push(cur);
+  return cols.map(function(c){ return (c||'').trim(); });
+}
+
+function hcParseHour(s){
+  if(!s) return null;
+  var m = s.match(/(\d{1,2}):(\d{2})/);
+  if(!m) return null;
+  var h = parseInt(m[1], 10);
+  return (h >= 0 && h <= 23) ? h : null;
+}
+
+function hcDateKey(d){
+  return d.getFullYear() + '-' +
+         ('0'+(d.getMonth()+1)).slice(-2) + '-' +
+         ('0'+d.getDate()).slice(-2);
+}
+
+function hcMonthKey(d){
+  return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2);
+}
+
+function hcFilterRows(){
+  var now = new Date();
+  return hcRows.filter(function(r){
+    // period
+    if(hcPeriod === 'month'){
+      if(r.date.getFullYear() !== now.getFullYear() ||
+         r.date.getMonth()    !== now.getMonth()) return false;
+    } else if(hcPeriod === 'week'){
+      var diff = (now - r.date) / 86400000;
+      if(diff < 0 || diff > 7) return false;
+    }
+    // delivery
+    if(hcDelivery !== '__all__' && r.delivery !== hcDelivery) return false;
+    return true;
+  });
+}
+
+function hcBuildDeliveryFilters(){
+  var types = {};
+  hcRows.forEach(function(r){ types[r.delivery] = true; });
+  var wrap = document.getElementById('hc-delivery-filters');
+  var html = '<span class="hc-filter-label">Тип доставки:</span>' +
+             '<button class="hc-pill del' + (hcDelivery==='__all__' ? ' on' : '') +
+             '" id="hf-del-__all__" onclick="hcSetDelivery('__all__')">Все</button>';
+  Object.keys(types).sort().forEach(function(t){
+    var on = hcDelivery === t ? ' on' : '';
+    var id = 'hf-del-' + t.replace(/[^a-zA-Zа-яА-Я0-9]/g,'_');
+    html += '<button class="hc-pill del' + on + '" id="' + id +
+            '" onclick="hcSetDelivery('' + t.replace(/'/g,"\'") + '')">' + t + '</button>';
+  });
+  wrap.innerHTML = html;
+}
+
+function hcSetPeriod(p){
+  hcPeriod = p;
+  ['all','month','week'].forEach(function(v){
+    var el = document.getElementById('hf-period-' + v);
+    if(el) el.className = 'hc-pill' + (v === p ? ' on' : '');
+  });
+  hcLevel = 'months'; hcSelMonth = null; hcSelDay = null;
+  hcRender();
+}
+
+function hcSetDelivery(d){
+  hcDelivery = d;
+  hcBuildDeliveryFilters();
+  hcLevel = 'months'; hcSelMonth = null; hcSelDay = null;
+  hcRender();
+}
+
+function hcRender(){
+  if(hcLevel === 'months') hcRenderMonths();
+  else if(hcLevel === 'days') hcRenderDays();
+  else hcRenderHours();
+  hcRenderBreadcrumb();
+}
+
+/* ---- УРОВЕНЬ 1: месяцы ---- */
+function hcRenderMonths(){
+  var rows = hcFilterRows();
+  // группируем по месяцам
+  var mmap = {};
+  rows.forEach(function(r){
+    var mk = hcMonthKey(r.date);
+    if(!mmap[mk]) mmap[mk] = {key:mk, date:r.date, tasks:0, hours:{}};
+    mmap[mk].tasks++;
+    mmap[mk].hours[r.hour] = (mmap[mk].hours[r.hour]||0) + 1;
+  });
+  var months = Object.values(mmap).sort(function(a,b){ return a.key > b.key ? 1 : -1; });
+
+  if(!months.length){
+    document.getElementById('hc-content').innerHTML = '<div class="hc-empty">Нет данных для выбранного периода</div>';
+    return;
+  }
+
+  var html = '<div class="hc-month-grid">';
+  months.forEach(function(m){
+    var peak = hcPeakHour(m.hours);
+    var mn = m.date.getMonth(), yr = m.date.getFullYear();
+    html += '<div class="hc-month-card" onclick="hcDrillMonth('' + m.key + '')">';
+    html += '<div class="hc-mc-title">' + MONTHS_RU[mn] + '</div>';
+    html += '<div class="hc-mc-sub">' + yr + '</div>';
+    html += '<div class="hc-mc-stat">📦 ' + m.tasks + ' заданий</div>';
+    if(peak !== null) html += '<div class="hc-dc-peak">Пик: ' + peak + ':00–' + peak + ':59</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById('hc-content').innerHTML = html;
+}
+
+/* ---- УРОВЕНЬ 2: дни месяца ---- */
+function hcRenderDays(){
+  var rows = hcFilterRows().filter(function(r){ return hcMonthKey(r.date) === hcSelMonth; });
+  var dmap = {};
+  rows.forEach(function(r){
+    var dk = hcDateKey(r.date);
+    if(!dmap[dk]) dmap[dk] = {key:dk, date:r.date, tasks:0, hours:{}};
+    dmap[dk].tasks++;
+    dmap[dk].hours[r.hour] = (dmap[dk].hours[r.hour]||0) + 1;
+  });
+  var days = Object.values(dmap).sort(function(a,b){ return a.key > b.key ? 1 : -1; });
+
+  if(!days.length){
+    document.getElementById('hc-content').innerHTML = '<div class="hc-empty">Нет данных за выбранный месяц</div>';
+    return;
+  }
+
+  var html = '<div class="hc-day-grid">';
+  days.forEach(function(d){
+    var peak = hcPeakHour(d.hours);
+    var dd = ('0'+d.date.getDate()).slice(-2);
+    var dowStr = dow(d.date);
+    html += '<div class="hc-day-card" onclick="hcDrillDay('' + d.key + '')">';
+    html += '<div class="hc-dc-date">' + dd + '</div>';
+    html += '<div class="hc-dc-dow">' + dowStr + '</div>';
+    html += '<div class="hc-dc-tasks">📦 ' + d.tasks + ' заданий</div>';
+    if(peak !== null) html += '<div class="hc-dc-peak">Пик: ' + peak + ':00</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById('hc-content').innerHTML = html;
+}
+
+/* ---- УРОВЕНЬ 3: часы ---- */
+function hcRenderHours(){
+  var rows = hcFilterRows().filter(function(r){
+    if(hcSelDay && hcDateKey(r.date) !== hcSelDay) return false;
+    if(!hcSelDay && hcSelMonth && hcMonthKey(r.date) !== hcSelMonth) return false;
+    return true;
+  });
+
+  var hmap = {};
+  for(var h = 0; h <= 23; h++) hmap[h] = {tasks:[], nums:[]};
+  rows.forEach(function(r){
+    hmap[r.hour].tasks.push(r);
+    hmap[r.hour].nums.push(r.num);
+  });
+
+  var maxVal = 0;
+  for(var h2 = 0; h2 <= 23; h2++) if(hmap[h2].tasks.length > maxVal) maxVal = hmap[h2].tasks.length;
+  if(maxVal === 0){
+    document.getElementById('hc-content').innerHTML = '<div class="hc-empty">Нет заданий за выбранный период</div>';
+    return;
+  }
+
+  var html = '<div style="margin-bottom:8px;font-size:11px;color:#9ca3af">Нажмите на час чтобы увидеть задания</div>';
+  html += '<div class="hc-bar-wrap">';
+  for(var h3 = 0; h3 <= 23; h3++){
+    var cnt = hmap[h3].tasks.length;
+    var pct = maxVal > 0 ? (cnt / maxVal * 100) : 0;
+    var barColor = cnt === 0 ? '#252830' : (pct > 79 ? '#ff3d57' : pct > 49 ? '#ffea00' : '#00e676');
+    var numsJson = JSON.stringify(hmap[h3].nums).replace(/"/g,'&quot;');
+    html += '<div class="hc-row" onclick="hcShowTasks(' + h3 + ','' + (hcSelDay||'') + '')">';
+    html += '<div class="hc-row-label">' + ('0'+h3).slice(-2) + ':00</div>';
+    html += '<div class="hc-bar-bg">';
+    html += '<div class="hc-bar-fill" style="width:' + Math.max(pct,0) + '%;background:' + barColor + '">';
+    if(cnt > 0 && pct > 15) html += cnt + ' зад.';
+    html += '</div></div>';
+    html += '<div class="hc-bar-val" style="color:' + (cnt>0?barColor:'#4b5563') + '">' + (cnt||'') + '</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+  document.getElementById('hc-content').innerHTML = html;
+}
+
+function hcPeakHour(hours){
+  var peak = null, max = 0;
+  Object.keys(hours).forEach(function(h){
+    if(hours[h] > max){ max = hours[h]; peak = parseInt(h,10); }
+  });
+  return peak;
+}
+
+function hcDrillMonth(mk){
+  hcSelMonth = mk; hcSelDay = null; hcLevel = 'days'; hcRender();
+}
+
+function hcDrillDay(dk){
+  hcSelDay = dk; hcLevel = 'hours'; hcRender();
+}
+
+function hcShowTasks(hour, dayKey){
+  var rows = hcFilterRows().filter(function(r){
+    if(r.hour !== hour) return false;
+    if(dayKey && hcDateKey(r.date) !== dayKey) return false;
+    if(!dayKey && hcSelMonth && hcMonthKey(r.date) !== hcSelMonth) return false;
+    return true;
+  });
+  if(!rows.length) return;
+
+  var label = ('0'+hour).slice(-2) + ':00–' + ('0'+hour).slice(-2) + ':59';
+  var html = '<div style="margin-bottom:10px;font-size:13px;font-weight:700;color:#4fc3f7">' +
+             '🕐 ' + label + ' — ' + rows.length + ' заданий</div>';
+  html += '<table class="tasks-table"><thead><tr>' +
+          '<th>№ задания</th><th>Дата сборки</th><th>Время</th><th>Тип доставки</th>' +
+          '</tr></thead><tbody>';
+  rows.sort(function(a,b){ return a.num - b.num; }).forEach(function(r){
+    var dd = ('0'+r.date.getDate()).slice(-2) + '.' +
+             ('0'+(r.date.getMonth()+1)).slice(-2) + '.' + r.date.getFullYear();
+    html += '<tr><td class="task-num-cell">' + r.num + '</td>' +
+            '<td class="date-cell">' + dd + '</td>' +
+            '<td class="date-cell">' + ('0'+r.hour).slice(-2) + ':xx</td>' +
+            '<td class="client-cell">' + r.delivery + '</td></tr>';
+  });
+  html += '</tbody></table>';
+
+  // показываем поверх текущего часового графика в модалке-дне
+  var wrap = document.getElementById('hc-content');
+  var existing = document.getElementById('hc-task-popup');
+  if(existing) existing.remove();
+  var popup = document.createElement('div');
+  popup.id = 'hc-task-popup';
+  popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:299;display:flex;align-items:flex-end;justify-content:center';
+  popup.innerHTML = '<div style="background:#161920;border-radius:12px 12px 0 0;padding:20px;width:100%;max-height:80vh;overflow-y:auto">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">' +
+    '<div></div><button onclick="document.getElementById('hc-task-popup').remove()" style="background:none;border:none;color:#6b7280;font-size:22px;cursor:pointer">✕</button></div>' +
+    html + '</div>';
+  popup.onclick = function(e){ if(e.target === popup) popup.remove(); };
+  document.body.appendChild(popup);
+}
+
+function hcRenderBreadcrumb(){
+  var bc = '<a onclick="hcGoTop()">По часам</a>';
+  if(hcSelMonth || hcLevel === 'days'){
+    var mk = hcSelMonth || '';
+    var parts = mk.split('-');
+    var mn = parseInt(parts[1],10)-1;
+    bc += ' <span>›</span> <a onclick="hcDrillMonth('' + mk + '')">' + MONTHS_RU[mn] + ' ' + parts[0] + '</a>';
+  }
+  if(hcSelDay){
+    var dp = hcSelDay.split('-');
+    bc += ' <span>›</span> ' + dp[2] + '.' + dp[1] + '.' + dp[0];
+  }
+  if(hcLevel === 'months') bc = '<span style="color:#4fc3f7;font-weight:700">По часам — все месяцы</span>';
+  document.getElementById('hc-breadcrumb').innerHTML = bc;
+}
+
+function hcGoTop(){
+  hcLevel = 'months'; hcSelMonth = null; hcSelDay = null; hcRender();
+}
+
+/* Расширяем setView для нового режима */
+var _origSetView = setView;
+setView = function(v){
+  _origSetView(v);
+  var hEl = document.getElementById('view-hourly');
+  var hBtn = document.getElementById('btn-hourly');
+  if(!hEl || !hBtn) return;
+  if(v === 'hourly'){
+    hEl.style.display = '';
+    hBtn.className = 'tb on';
+    // подгружаем данные если ещё не загружены
+    if(!hcRows.length) hcFetch();
+    else hcRender();
+  } else {
+    hEl.style.display = 'none';
+    hBtn.className = 'tb';
+  }
+};
 </script>
 </body>
 </html>
