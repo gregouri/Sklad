@@ -11,63 +11,93 @@ body{background:#0d0f14;color:#e8eaf0;font-family:-apple-system,BlinkMacSystemFo
 header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
 .logo{font-size:17px;font-weight:900;color:#4fc3f7;letter-spacing:1px}
 .sub{font-size:11px;color:#9ca3af;margin-top:2px}
-.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#00e676;margin-right:5px}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#00e676;margin-right:5px;flex-shrink:0}
 .dot.err{background:#ff3d57}
 .dot.loading{background:#ffea00;animation:pulse 1s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-.toolbar{padding:10px 16px;background:#161920;border-bottom:1px solid #252830;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.pill{padding:5px 13px;border:1px solid #252830;background:transparent;color:#9ca3af;font-size:11px;font-weight:700;border-radius:20px;cursor:pointer;transition:all 0.15s}
+/* TOOLBAR */
+.toolbar{padding:10px 16px;background:#161920;border-bottom:1px solid #252830;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tbar-group{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.tbar-label{font-size:11px;color:#4fc3f7;font-weight:700;white-space:nowrap}
+.pill{padding:5px 12px;border:1px solid #252830;background:transparent;color:#9ca3af;font-size:11px;font-weight:700;border-radius:20px;cursor:pointer;transition:all .15s;white-space:nowrap}
 .pill.on{background:#4fc3f7;color:#000;border-color:#4fc3f7}
-.pill.del{border-color:#7c4dff44}
 .pill.del.on{background:#7c4dff;color:#fff;border-color:#7c4dff}
-.sep{width:1px;height:20px;background:#252830;margin:0 4px}
-.cache-badge{font-size:10px;color:#6b7280;padding:4px 8px;background:#1a1d24;border-radius:4px;border:1px solid #252830}
-.refresh-btn{padding:5px 13px;background:#252830;border:none;color:#4fc3f7;font-size:11px;font-weight:700;border-radius:20px;cursor:pointer}
+.pill.del{border-color:#7c4dff44}
+.sep{width:1px;height:22px;background:#252830;flex-shrink:0}
+.refresh-btn{padding:5px 12px;background:#252830;border:none;color:#4fc3f7;font-size:11px;font-weight:700;border-radius:20px;cursor:pointer}
 .refresh-btn:hover{background:#2d3244}
 
-.main{padding:14px 16px}
+/* DATE RANGE */
+.date-range{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.date-inp{padding:4px 8px;background:#0d0f14;border:1px solid #252830;color:#e8eaf0;border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer}
+.date-inp:focus{outline:none;border-color:#4fc3f7}
+.date-inp::-webkit-calendar-picker-indicator{filter:invert(.5)}
+.date-apply{padding:4px 10px;background:#4fc3f7;border:none;color:#000;font-size:11px;font-weight:700;border-radius:6px;cursor:pointer}
+.date-apply:hover{background:#38b2e8}
+.date-clear{padding:4px 8px;background:transparent;border:1px solid #252830;color:#9ca3af;font-size:11px;border-radius:6px;cursor:pointer}
+.date-clear:hover{border-color:#4fc3f7;color:#4fc3f7}
 
-/* SUMMARY CARDS */
-.summary{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.si{flex:1;min-width:100px;background:#161920;border:1px solid #252830;border-radius:6px;padding:10px;text-align:center}
+/* SUMMARY */
+.main{padding:14px 16px}
+.summary{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.si{flex:1;min-width:90px;background:#161920;border:1px solid #252830;border-radius:6px;padding:10px;text-align:center}
 .sn{font-size:22px;font-weight:900;line-height:1}
 .sd{font-size:10px;color:#9ca3af;margin-top:3px}
 
-/* HEATMAP */
+/* SECTION */
 .section{background:#161920;border:1px solid #252830;border-radius:8px;padding:16px;margin-bottom:14px}
-.section-title{font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px}
+.section-title{font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+
+/* LINE CHART */
+.linechart-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;position:relative}
+canvas#lineChart{display:block}
+
+/* HEATMAP */
 .heatmap-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.heatmap{display:grid;gap:2px}
-.hm-row{display:flex;align-items:center;gap:2px}
-.hm-label{font-size:10px;color:#6b7280;width:56px;flex-shrink:0;text-align:right;padding-right:6px;white-space:nowrap}
-.hm-cell{width:30px;height:28px;border-radius:3px;cursor:pointer;transition:transform 0.1s;position:relative;flex-shrink:0}
-.hm-cell:hover{transform:scale(1.15);z-index:10}
-.hm-cell-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:rgba(0,0,0,0.75)}
-.hm-hour-labels{display:flex;gap:2px;margin-left:62px;margin-bottom:4px}
+.hm-row{display:flex;align-items:center;gap:2px;margin-bottom:2px}
+.hm-label{font-size:10px;color:#6b7280;width:58px;flex-shrink:0;text-align:right;padding-right:6px;white-space:nowrap}
+.hm-cell{width:30px;height:26px;border-radius:3px;cursor:pointer;transition:transform .1s;position:relative;flex-shrink:0}
+.hm-cell:hover{transform:scale(1.2);z-index:10}
+.hm-cell-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:rgba(0,0,0,.8)}
+.hm-hour-labels{display:flex;gap:2px;margin-left:64px;margin-bottom:4px}
 .hm-hlabel{width:30px;text-align:center;font-size:9px;color:#6b7280;flex-shrink:0}
 .hm-legend{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
-.hm-leg-title{font-size:10px;color:#6b7280}
-.hm-leg-scale{display:flex;gap:2px;align-items:center}
-.hm-leg-cell{width:16px;height:16px;border-radius:2px}
+.hm-leg-cell{width:14px;height:14px;border-radius:2px}
 .hm-leg-label{font-size:9px;color:#6b7280}
 
-/* BAR CHART — часы суммарно */
+/* BAR DRILL */
 .bar-wrap{display:flex;flex-direction:column;gap:4px}
 .bar-row{display:flex;align-items:center;gap:8px;cursor:pointer}
 .bar-row:hover .bar-fill{filter:brightness(1.2)}
 .bar-label{font-size:11px;color:#9ca3af;width:44px;text-align:right;flex-shrink:0}
-.bar-bg{flex:1;height:24px;background:#1d2028;border-radius:3px;overflow:hidden;position:relative}
-.bar-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:700;color:rgba(0,0,0,0.8);white-space:nowrap;transition:width 0.4s}
-.bar-val{font-size:11px;font-weight:700;width:42px;text-align:right;flex-shrink:0}
+.bar-bg{flex:1;height:24px;background:#1d2028;border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:700;color:rgba(0,0,0,.85);white-space:nowrap;transition:width .4s}
+.bar-val{font-size:11px;font-weight:700;width:40px;text-align:right;flex-shrink:0}
 
-/* DRILL DOWN */
+/* MONTH/DAY GRID */
+.m-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.m-card{background:#0d0f14;border:1px solid #252830;border-radius:7px;padding:12px;cursor:pointer;border-top:3px solid #4fc3f7;transition:transform .1s}
+.m-card:hover{transform:translateY(-2px)}
+.m-card-title{font-size:18px;font-weight:900;margin-bottom:1px}
+.m-card-sub{font-size:10px;color:#9ca3af;margin-bottom:7px}
+.m-card-stat{font-size:11px;color:#e8eaf0;margin-bottom:2px}
+.m-card-peak{font-size:10px;color:#ffea00;margin-top:5px}
+.d-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:6px}
+.d-card{background:#0d0f14;border:1px solid #252830;border-radius:6px;padding:9px;cursor:pointer;transition:transform .1s}
+.d-card:hover{transform:translateY(-2px);border-color:#4fc3f7}
+.d-card-date{font-size:16px;font-weight:900}
+.d-card-dow{font-size:9px;color:#9ca3af;margin-bottom:4px}
+.d-card-tasks{font-size:11px;color:#9ca3af}
+.d-card-peak{font-size:10px;color:#ffea00;margin-top:3px}
+
+/* BREADCRUMB */
 .breadcrumb{font-size:12px;color:#6b7280;margin-bottom:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .breadcrumb a{color:#4fc3f7;cursor:pointer;font-weight:700}
 .breadcrumb a:hover{text-decoration:underline}
 
-/* TASK LIST POPUP */
-.popup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:299;align-items:flex-end;justify-content:center}
+/* POPUP */
+.popup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:299;align-items:flex-end;justify-content:center}
 .popup-overlay.on{display:flex}
 .popup{background:#161920;border-radius:12px 12px 0 0;padding:20px;width:100%;max-height:82vh;overflow-y:auto}
 .popup-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
@@ -84,23 +114,23 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
 .loading-msg{text-align:center;padding:40px;color:#6b7280;font-size:13px}
 .err-box{background:#1a0f10;border:1px solid #ff3d57;border-radius:6px;padding:14px;font-size:12px;color:#ff8a80;line-height:1.7}
 .empty{padding:24px;text-align:center;color:#6b7280;font-size:12px}
+.cache-badge{font-size:10px;color:#6b7280;padding:3px 8px;background:#1a1d24;border-radius:4px;border:1px solid #252830}
 
-/* MONTH/DAY GRID */
-.m-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
-.m-card{background:#0d0f14;border:1px solid #252830;border-radius:7px;padding:12px;cursor:pointer;border-top:3px solid #4fc3f7;transition:transform 0.1s}
-.m-card:hover{transform:translateY(-2px)}
-.m-card-title{font-size:18px;font-weight:900;margin-bottom:2px}
-.m-card-sub{font-size:10px;color:#9ca3af;margin-bottom:8px}
-.m-card-stat{font-size:11px;color:#e8eaf0;margin-bottom:3px}
-.m-card-peak{font-size:10px;color:#ffea00;margin-top:6px}
+/* HOUR STRIP */
+.hour-strip{background:#161920;border-bottom:1px solid #252830;padding:8px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.hour-strip-inner{display:flex;gap:3px;min-width:max-content;align-items:flex-end;height:54px}
+.hs-col{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;position:relative}
+.hs-col:hover .hs-bar{filter:brightness(1.3)}
+.hs-col:hover .hs-tooltip{display:block}
+.hs-bar{border-radius:3px 3px 0 0;width:28px;transition:height .35s,background .35s;min-height:2px}
+.hs-pct{font-size:8px;color:#9ca3af;line-height:1;white-space:nowrap}
+.hs-lbl{font-size:8px;color:#6b7280;white-space:nowrap}
+.hs-tooltip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1d2028;border:1px solid #4fc3f7;border-radius:5px;padding:5px 8px;font-size:10px;white-space:nowrap;z-index:200;line-height:1.5;pointer-events:none}
+.hs-title{font-size:10px;color:#6b7280;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.hs-title b{color:#4fc3f7}
 
-.d-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px}
-.d-card{background:#0d0f14;border:1px solid #252830;border-radius:6px;padding:10px;cursor:pointer;transition:transform 0.1s}
-.d-card:hover{transform:translateY(-2px);border-color:#4fc3f7}
-.d-card-date{font-size:16px;font-weight:900}
-.d-card-dow{font-size:9px;color:#9ca3af;margin-bottom:5px}
-.d-card-tasks{font-size:11px;color:#9ca3af}
-.d-card-peak{font-size:10px;color:#ffea00;margin-top:4px}
+/* TOOLTIP */
+.lc-tooltip{position:fixed;background:#1d2028;border:1px solid #4fc3f7;border-radius:6px;padding:8px 12px;font-size:11px;pointer-events:none;z-index:100;display:none;line-height:1.6;min-width:120px}
 </style>
 </head>
 <body>
@@ -110,48 +140,94 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
     <div class="logo">📊 ЗАГРУЗКА ПО ЧАСАМ</div>
     <div class="sub">МОНИТОРИНГ ЧАСОВОЙ ИНТЕНСИВНОСТИ СКЛАДА</div>
   </div>
-  <div style="font-size:11px;color:#6b7280;text-align:right;display:flex;align-items:center;gap:8px">
+  <div style="display:flex;align-items:center;gap:8px">
     <span class="cache-badge" id="cache-info">—</span>
-    <span><span class="dot loading" id="dot"></span><span id="upd-time">Загрузка...</span></span>
+    <span style="font-size:11px;color:#6b7280;display:flex;align-items:center">
+      <span class="dot loading" id="dot"></span><span id="upd-time">Загрузка...</span>
+    </span>
   </div>
 </header>
 
 <div class="toolbar">
-  <span style="font-size:11px;color:#4fc3f7;font-weight:700">Период:</span>
-  <button class="pill on" id="fp-all"   onclick="setPeriod('all')">Всё время</button>
-  <button class="pill"    id="fp-month" onclick="setPeriod('month')">Этот месяц</button>
-  <button class="pill"    id="fp-week"  onclick="setPeriod('week')">7 дней</button>
+  <!-- Период -->
+  <div class="tbar-group">
+    <span class="tbar-label">Период:</span>
+    <button class="pill on" id="fp-all"   onclick="setPeriod('all')">Всё время</button>
+    <button class="pill"    id="fp-month" onclick="setPeriod('month')">Этот месяц</button>
+    <button class="pill"    id="fp-week"  onclick="setPeriod('week')">7 дней</button>
+  </div>
   <div class="sep"></div>
-  <div id="delivery-pills" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-    <span style="font-size:11px;color:#4fc3f7;font-weight:700">Доставка:</span>
+  <!-- Произвольный диапазон -->
+  <div class="tbar-group">
+    <span class="tbar-label">Диапазон:</span>
+    <div class="date-range">
+      <input type="date" id="date-from" class="date-inp" onchange="onDateChange()">
+      <span style="color:#6b7280;font-size:11px">—</span>
+      <input type="date" id="date-to"   class="date-inp" onchange="onDateChange()">
+      <button class="date-apply" onclick="applyDateRange()">Применить</button>
+      <button class="date-clear" onclick="clearDateRange()">✕</button>
+    </div>
+  </div>
+  <div class="sep"></div>
+  <!-- Тип доставки -->
+  <div class="tbar-group" id="delivery-pills">
+    <span class="tbar-label">Доставка:</span>
   </div>
   <div class="sep"></div>
   <button class="refresh-btn" onclick="loadFresh()">↻ Обновить</button>
 </div>
 
+<!-- HOUR STRIP -->
+<div class="hour-strip" id="hour-strip">
+  <div class="hs-title">⏱ Загрузка по часам: <b id="hs-period-label">все данные</b> &nbsp;·&nbsp; нажмите на час чтобы открыть задания</div>
+  <div class="hour-strip-inner" id="hs-inner">
+    <div class="loading-msg" style="padding:4px 0;font-size:11px">⏳</div>
+  </div>
+</div>
+
 <div class="main">
+  <!-- SUMMARY -->
   <div class="summary">
-    <div class="si"><div class="sn" id="s-total">—</div><div class="sd">заданий всего</div></div>
+    <div class="si"><div class="sn" id="s-total">—</div><div class="sd">заданий</div></div>
     <div class="si"><div class="sn" id="s-days">—</div><div class="sd">рабочих дней</div></div>
     <div class="si"><div class="sn" style="color:#ffea00" id="s-peak-hour">—</div><div class="sd">час-пик</div></div>
     <div class="si"><div class="sn" style="color:#00e676" id="s-avg">—</div><div class="sd">сред/день</div></div>
+    <div class="si"><div class="sn" style="color:#4fc3f7" id="s-busiest">—</div><div class="sd">загруженный день</div></div>
+  </div>
+
+  <!-- LINE CHART -->
+  <div class="section">
+    <div class="section-title">
+      <span id="line-title">Динамика заданий по дням</span>
+      <div style="display:flex;gap:8px">
+        <button class="pill on" id="lg-day"   onclick="setLineGroup('day')"   style="padding:3px 10px">По дням</button>
+        <button class="pill"    id="lg-week"  onclick="setLineGroup('week')"  style="padding:3px 10px">По неделям</button>
+        <button class="pill"    id="lg-month" onclick="setLineGroup('month')" style="padding:3px 10px">По месяцам</button>
+      </div>
+    </div>
+    <div class="linechart-wrap">
+      <canvas id="lineChart" height="180"></canvas>
+    </div>
   </div>
 
   <!-- HEATMAP -->
-  <div class="section" id="heatmap-section">
-    <div class="section-title">Тепловая карта — дни × часы</div>
+  <div class="section">
+    <div class="section-title">Тепловая карта — дни × часы <span style="font-size:10px;font-weight:400;color:#6b7280">(нажмите ячейку → список заданий)</span></div>
     <div class="heatmap-wrap" id="heatmap-wrap">
       <div class="loading-msg">⏳ Загрузка...</div>
     </div>
   </div>
 
-  <!-- BAR CHART (drill) -->
+  <!-- BAR DRILL -->
   <div class="section">
-    <div class="section-title" id="bar-title">Загрузка по часам — суммарно</div>
+    <div class="section-title" id="bar-title">Детализация по месяцам</div>
     <div class="breadcrumb" id="breadcrumb"></div>
     <div id="bar-content"><div class="loading-msg">⏳ Загрузка...</div></div>
   </div>
 </div>
+
+<!-- TOOLTIP -->
+<div class="lc-tooltip" id="lc-tooltip"></div>
 
 <!-- POPUP -->
 <div class="popup-overlay" id="popup" onclick="if(event.target===this)closePopup()">
@@ -167,124 +243,82 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
 <script>
 var SHEET_ID = '1UC9fKZo9B87MTCyRaOaO8_ydEdWmFGc1NwcOn2790vg';
 var GID      = '1440282364';
-var CACHE_KEY = 'wh_hours_cache';
-var CACHE_TTL = 60 * 60 * 1000; // 1 час
+var CACHE_KEY= 'wh_hours_v2';
+var CACHE_TTL= 60*60*1000;
 
-var allRows    = [];  // {num, date, dateKey, monthKey, hour, delivery}
-var activePeriod   = 'all';
-var activeDelivery = '__all__';
-var drillLevel = 'top';   // 'top' | 'month' | 'day'
-var drillMonth = null;    // 'YYYY-MM'
-var drillDay   = null;    // 'YYYY-MM-DD'
+var allRows      = [];
+var activePeriod = 'all';
+var activeDelivery='__all__';
+var dateFrom     = null;
+var dateTo       = null;
+var lineGroup    = 'day';
+var drillLevel   = 'top';
+var drillMonth   = null;
+var drillDay     = null;
 
-var MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь',
-              'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-var MONTHS_SHORT = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
-var DOW = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+var MONTHS      =['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+var MONTHS_SHORT=['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+var DOW         =['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
 
-/* ===================== DATA LOADING ===================== */
+/* ============ DATA ============ */
+function loadData(){
+  var cached=getCache();
+  if(cached){
+    processCSV(cached.txt);
+    setStatus('ok','Кэш '+cached.time);
+    document.getElementById('cache-info').textContent='Кэш: '+cached.time;
+    render();
+  } else { setStatus('loading','Загрузка...'); }
+
+  fetchSheet().then(function(txt){
+    processCSV(txt); saveCache(txt);
+    setStatus('ok','Обновлено '+timeNow());
+    document.getElementById('cache-info').textContent='Обновлено '+timeNow();
+    render();
+  }).catch(function(e){ if(!allRows.length) handleError(e); });
+}
 
 function loadFresh(){
   setStatus('loading','Обновление...');
   fetchSheet().then(function(txt){
-    processCSV(txt);
-    saveCache(txt);
-    setStatus('ok','Обновлено ' + timeNow());
+    processCSV(txt); saveCache(txt);
+    setStatus('ok','Обновлено '+timeNow());
+    document.getElementById('cache-info').textContent='Обновлено '+timeNow();
     render();
   }).catch(handleError);
 }
 
-function loadData(){
-  // 1. Показываем кэш мгновенно
-  var cached = getCache();
-  if(cached){
-    processCSV(cached.txt);
-    setStatus('ok','Из кэша · ' + cached.time);
-    document.getElementById('cache-info').textContent = 'Кэш: ' + cached.time;
-    render();
-  } else {
-    setStatus('loading','Загрузка...');
-  }
-  // 2. Тихо обновляем с сервера
-  fetchSheet().then(function(txt){
-    processCSV(txt);
-    saveCache(txt);
-    setStatus('ok','Обновлено ' + timeNow());
-    document.getElementById('cache-info').textContent = 'Кэш обновлён ' + timeNow();
-    render();
-  }).catch(function(e){
-    if(!allRows.length) handleError(e);
-    else document.getElementById('upd-time').textContent = 'Ошибка обновления (показан кэш)';
-  });
-}
-
 function fetchSheet(){
-  var url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID +
-            '/export?format=csv&gid=' + GID + '&t=' + Date.now();
-  return fetch(url).then(function(r){
-    if(!r.ok) throw new Error('HTTP ' + r.status);
-    return r.text();
-  });
+  var url='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/export?format=csv&gid='+GID+'&t='+Date.now();
+  return fetch(url).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); });
 }
 
-function saveCache(txt){
-  try{
-    localStorage.setItem(CACHE_KEY, JSON.stringify({txt:txt, ts:Date.now(), time:timeNow()}));
-  }catch(e){}
-}
-
-function getCache(){
-  try{
-    var raw = localStorage.getItem(CACHE_KEY);
-    if(!raw) return null;
-    var obj = JSON.parse(raw);
-    if(Date.now() - obj.ts > CACHE_TTL) return null;
-    return obj;
-  }catch(e){ return null; }
-}
-
+function saveCache(txt){ try{ localStorage.setItem(CACHE_KEY,JSON.stringify({txt:txt,ts:Date.now(),time:timeNow()})); }catch(e){} }
+function getCache(){ try{ var o=JSON.parse(localStorage.getItem(CACHE_KEY)||'null'); return o&&(Date.now()-o.ts<CACHE_TTL)?o:null; }catch(e){return null;} }
 function handleError(e){
   setStatus('err','Ошибка');
-  var msg = '<div class="err-box">⚠️ Не удалось загрузить данные.<br>' + e.message +
-    '<br><br>Убедитесь что таблица открыта для чтения:<br>' +
-    '<b>Файл → Доступ → Все у кого есть ссылка → Читатель</b></div>';
-  document.getElementById('heatmap-wrap').innerHTML = msg;
-  document.getElementById('bar-content').innerHTML = '';
+  var m='<div class="err-box">⚠️ Не удалось загрузить данные.<br>'+e.message+'<br><br>Откройте доступ к таблице:<br><b>Файл → Доступ → Все у кого есть ссылка → Читатель</b></div>';
+  document.getElementById('heatmap-wrap').innerHTML=m;
+  document.getElementById('bar-content').innerHTML='';
 }
+function setStatus(s,t){ var d=document.getElementById('dot'); d.className='dot'+(s==='err'?' err':s==='loading'?' loading':''); document.getElementById('upd-time').textContent=t; }
+function timeNow(){ var n=new Date(); return ('0'+n.getHours()).slice(-2)+':'+('0'+n.getMinutes()).slice(-2); }
 
-function setStatus(state, text){
-  var dot = document.getElementById('dot');
-  dot.className = 'dot' + (state==='err'?' err':state==='loading'?' loading':'');
-  document.getElementById('upd-time').textContent = text;
-}
-
-function timeNow(){
-  var n = new Date();
-  return ('0'+n.getHours()).slice(-2)+':'+('0'+n.getMinutes()).slice(-2);
-}
-
-/* ===================== CSV PARSING ===================== */
-
-function parseCSV(txt){
-  var lines = txt.split(/\r?\n/), rows = [];
-  for(var i=1;i<lines.length;i++){
-    var line=lines[i].trim(); if(!line) continue;
-    var cols=[],inq=false,cur='';
-    for(var j=0;j<line.length;j++){
-      var ch=line[j];
-      if(ch==='"'){inq=!inq;}
-      else if(ch===','&&!inq){cols.push(cur);cur='';}
-      else cur+=ch;
-    }
-    cols.push(cur);
-    rows.push(cols.map(function(c){return (c||'').trim();}));
+/* ============ CSV ============ */
+function parseCSVLine(line){
+  var cols=[],inq=false,cur='';
+  for(var j=0;j<line.length;j++){
+    var ch=line[j];
+    if(ch==='"'){inq=!inq;}
+    else if(ch===','&&!inq){cols.push(cur);cur='';}
+    else cur+=ch;
   }
-  return rows;
+  cols.push(cur);
+  return cols.map(function(c){return (c||'').trim();});
 }
 
 function parseDate(s){
-  if(!s) return null;
-  s=s.trim();
+  if(!s) return null; s=s.trim();
   var p;
   if(/^\d{2}\.\d{2}\.\d{4}$/.test(s)){p=s.split('.');return new Date(+p[2],+p[1]-1,+p[0]);}
   if(/^\d{4}-\d{2}-\d{2}/.test(s)){p=s.slice(0,10).split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
@@ -299,52 +333,71 @@ function parseHour(s){
   return (h>=0&&h<=23)?h:null;
 }
 
-function dkey(d){
-  return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
-}
-function mkey(d){
-  return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2);
+function dkey(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+function mkey(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2); }
+function wkey(d){
+  var tmp=new Date(d); tmp.setHours(0,0,0,0);
+  var day=tmp.getDay()||7;
+  tmp.setDate(tmp.getDate()-day+1);
+  return dkey(tmp);
 }
 
 function processCSV(txt){
-  var rows = parseCSV(txt);
-  allRows = [];
-  rows.forEach(function(c){
-    var num      = c[0];
-    var dateRaw  = c[6];   // G
-    var timeRaw  = c[7];   // H
-    var delivery = (c[8]||'').trim() || '—';
-    if(!num||!dateRaw||!timeRaw) return;
-    var d = parseDate(dateRaw);
-    if(!d) return;
-    var hour = parseHour(timeRaw);
-    if(hour===null) return;
-    allRows.push({
-      num:num, date:d,
-      dateKey:dkey(d), monthKey:mkey(d),
-      hour:hour, delivery:delivery
-    });
-  });
+  var lines=txt.split(/\r?\n/);
+  allRows=[];
+  for(var i=1;i<lines.length;i++){
+    var line=lines[i].trim(); if(!line) continue;
+    var c=parseCSVLine(line);
+    var num=c[0], dateRaw=c[6], timeRaw=c[7], delivery=(c[8]||'').trim()||'—';
+    if(!num||!dateRaw||!timeRaw) continue;
+    var d=parseDate(dateRaw); if(!d) continue;
+    var hour=parseHour(timeRaw); if(hour===null) continue;
+    allRows.push({num:num,date:d,dateKey:dkey(d),monthKey:mkey(d),weekKey:wkey(d),hour:hour,delivery:delivery});
+  }
   buildDeliveryPills();
+  setDateBounds();
 }
 
-/* ===================== FILTERS ===================== */
+/* ============ FILTERS ============ */
+function setDateBounds(){
+  if(!allRows.length) return;
+  var sorted=allRows.slice().sort(function(a,b){return a.date-b.date;});
+  var minD=sorted[0].date, maxD=sorted[sorted.length-1].date;
+  document.getElementById('date-from').min=dkey(minD);
+  document.getElementById('date-from').max=dkey(maxD);
+  document.getElementById('date-to').min=dkey(minD);
+  document.getElementById('date-to').max=dkey(maxD);
+}
 
-function getFiltered(){
-  var now = new Date(); now.setHours(0,0,0,0);
-  return allRows.filter(function(r){
-    if(activePeriod==='month'){
-      var n=new Date(); if(r.date.getFullYear()!==n.getFullYear()||r.date.getMonth()!==n.getMonth()) return false;
-    } else if(activePeriod==='week'){
-      var diff=(now-r.date)/86400000; if(diff<0||diff>7) return false;
-    }
-    if(activeDelivery!=='__all__'&&r.delivery!==activeDelivery) return false;
-    return true;
-  });
+function onDateChange(){
+  // просто подсвечиваем что диапазон выбран, применяем по кнопке
+}
+
+function applyDateRange(){
+  var f=document.getElementById('date-from').value;
+  var t=document.getElementById('date-to').value;
+  if(!f&&!t) return;
+  dateFrom=f?parseDate(f):null;
+  dateTo=t?parseDate(t):null;
+  if(dateTo) dateTo.setHours(23,59,59,999);
+  // сбрасываем pill-период
+  activePeriod='custom';
+  ['all','month','week'].forEach(function(v){ document.getElementById('fp-'+v).className='pill'; });
+  drillLevel='top'; drillMonth=null; drillDay=null;
+  render();
+}
+
+function clearDateRange(){
+  document.getElementById('date-from').value='';
+  document.getElementById('date-to').value='';
+  dateFrom=null; dateTo=null;
+  setPeriod('all');
 }
 
 function setPeriod(p){
-  activePeriod=p;
+  activePeriod=p; dateFrom=null; dateTo=null;
+  document.getElementById('date-from').value='';
+  document.getElementById('date-to').value='';
   ['all','month','week'].forEach(function(v){
     document.getElementById('fp-'+v).className='pill'+(v===p?' on':'');
   });
@@ -362,71 +415,273 @@ function buildDeliveryPills(){
   var types={};
   allRows.forEach(function(r){types[r.delivery]=true;});
   var wrap=document.getElementById('delivery-pills');
-  var html='<span style="font-size:11px;color:#4fc3f7;font-weight:700">Доставка:</span>';
+  var html='<span class="tbar-label">Доставка:</span>';
   html+='<button class="pill del'+(activeDelivery==='__all__'?' on':'')+'" onclick="setDelivery(\'__all__\')">Все</button>';
   Object.keys(types).sort().forEach(function(t){
     var on=activeDelivery===t?' on':'';
-    html+='<button class="pill del'+on+'" onclick="setDelivery(\''+t.replace(/'/g,"\\'")+'\')">' + t + '</button>';
+    html+='<button class="pill del'+on+'" onclick="setDelivery(\''+t.replace(/'/g,"\\'")+'\')">'+t+'</button>';
   });
   wrap.innerHTML=html;
 }
 
-/* ===================== RENDER ===================== */
+function getFiltered(){
+  var now=new Date(); now.setHours(0,0,0,0);
+  return allRows.filter(function(r){
+    if(activePeriod==='month'){
+      var n=new Date(); if(r.date.getFullYear()!==n.getFullYear()||r.date.getMonth()!==n.getMonth()) return false;
+    } else if(activePeriod==='week'){
+      var diff=(now-r.date)/86400000; if(diff<0||diff>7) return false;
+    } else if(activePeriod==='custom'){
+      if(dateFrom&&r.date<dateFrom) return false;
+      if(dateTo&&r.date>dateTo) return false;
+    }
+    if(activeDelivery!=='__all__'&&r.delivery!==activeDelivery) return false;
+    return true;
+  });
+}
 
+/* ============ RENDER ============ */
 function render(){
   var rows=getFiltered();
   renderSummary(rows);
+  renderHourStrip(rows);
+  renderLineChart(rows);
   renderHeatmap(rows);
   renderBarDrill(rows);
 }
 
+/* ---- HOUR STRIP ---- */
+function renderHourStrip(rows){
+  var hours=new Array(24).fill(0);
+  rows.forEach(function(r){hours[r.hour]++;});
+  var total=rows.length||1;
+  var maxH=Math.max.apply(null,hours)||1;
+  var BAR_MAX=36; // px высота максимального бара
+
+  function barColor(t){
+    if(t===0) return '#252830';
+    if(t<0.25) return '#00e676';
+    if(t<0.55) return '#ffea00';
+    if(t<0.8)  return '#ff9800';
+    return '#ff3d57';
+  }
+
+  // период label
+  var pLabel='все данные';
+  if(activePeriod==='month') pLabel='этот месяц';
+  else if(activePeriod==='week') pLabel='7 дней';
+  else if(activePeriod==='custom'){
+    var f=document.getElementById('date-from').value;
+    var t=document.getElementById('date-to').value;
+    pLabel=(f||'?')+' — '+(t||'?');
+  }
+  if(activeDelivery!=='__all__') pLabel+=' · '+activeDelivery;
+  document.getElementById('hs-period-label').textContent=pLabel;
+
+  var html='';
+  for(var h=0;h<24;h++){
+    var cnt=hours[h];
+    var pct=Math.round(cnt/total*100);
+    var t=cnt/maxH;
+    var barH=Math.max(Math.round(t*BAR_MAX),2);
+    var col=barColor(t);
+    var hh=('0'+h).slice(-2);
+    // find most common day for this hour (for tooltip)
+    var tooltip='<b style="color:#4fc3f7">'+hh+':00</b><br>Заданий: <b>'+cnt+'</b><br>Доля: <b>'+pct+'%</b>';
+    html+='<div class="hs-col" onclick="onHourStripClick('+h+')">'
+      +'<div class="hs-tooltip">'+tooltip+'</div>'
+      +'<div class="hs-pct">'+(pct>0?pct+'%':'')+'</div>'
+      +'<div class="hs-bar" style="height:'+barH+'px;background:'+col+'"></div>'
+      +'<div class="hs-lbl">'+hh+'</div>'
+      +'</div>';
+  }
+  document.getElementById('hs-inner').innerHTML=html;
+}
+
+function onHourStripClick(h){
+  // провалиться в день с максимумом для этого часа
+  var rows=getFiltered();
+  var dayCount={};
+  rows.filter(function(r){return r.hour===h;}).forEach(function(r){
+    dayCount[r.dateKey]=(dayCount[r.dateKey]||0)+1;
+  });
+  var keys=Object.keys(dayCount);
+  if(!keys.length) return;
+  var best=keys.reduce(function(a,b){return dayCount[a]>=dayCount[b]?a:b;});
+  showPopup(best,h);
+}
+
 /* ---- SUMMARY ---- */
 function renderSummary(rows){
-  var days={};
-  var hours=new Array(24).fill(0);
-  rows.forEach(function(r){days[r.dateKey]=true; hours[r.hour]++;});
-  var dayCount=Object.keys(days).length;
+  var days={}, hours=new Array(24).fill(0), dayCount={};
+  rows.forEach(function(r){
+    days[r.dateKey]=true;
+    hours[r.hour]++;
+    dayCount[r.dateKey]=(dayCount[r.dateKey]||0)+1;
+  });
+  var dayKeys=Object.keys(days);
   var peakH=hours.indexOf(Math.max.apply(null,hours));
-  var avg=dayCount>0?Math.round(rows.length/dayCount):0;
+  var avg=dayKeys.length>0?Math.round(rows.length/dayKeys.length):0;
+  var busiestDay=dayKeys.reduce(function(best,k){return (dayCount[k]>(dayCount[best]||0))?k:best;},dayKeys[0]||'');
+  var busiestLabel=busiestDay?busiestDay.split('-').reverse().join('.'):'—';
+
   document.getElementById('s-total').textContent=rows.length;
-  document.getElementById('s-days').textContent=dayCount;
-  document.getElementById('s-peak-hour').textContent=('0'+peakH).slice(-2)+':00';
+  document.getElementById('s-days').textContent=dayKeys.length;
+  document.getElementById('s-peak-hour').textContent=rows.length?('0'+peakH).slice(-2)+':00':'—';
   document.getElementById('s-avg').textContent=avg;
+  document.getElementById('s-busiest').textContent=busiestLabel;
+}
+
+/* ---- LINE CHART (Canvas) ---- */
+function setLineGroup(g){
+  lineGroup=g;
+  ['day','week','month'].forEach(function(v){ document.getElementById('lg-'+v).className='pill'+(v===g?' on':''); });
+  renderLineChart(getFiltered());
+}
+
+function renderLineChart(rows){
+  var canvas=document.getElementById('lineChart');
+  var wrap=canvas.parentElement;
+  var dpr=window.devicePixelRatio||1;
+
+  // группируем
+  var grouped={};
+  rows.forEach(function(r){
+    var key=lineGroup==='month'?r.monthKey:lineGroup==='week'?r.weekKey:r.dateKey;
+    grouped[key]=(grouped[key]||0)+1;
+  });
+  var keys=Object.keys(grouped).sort();
+  if(!keys.length){ canvas.style.display='none'; return; }
+  canvas.style.display='block';
+
+  var vals=keys.map(function(k){return grouped[k];});
+  var maxVal=Math.max.apply(null,vals)||1;
+
+  // ширина — минимум контейнер, но не меньше чем нужно для всех точек
+  var minW=Math.max(wrap.clientWidth||600, keys.length*28+80);
+  var W=minW, H=180;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+
+  var ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,H);
+
+  var PAD={t:20,r:20,b:36,l:46};
+  var cW=W-PAD.l-PAD.r, cH=H-PAD.t-PAD.b;
+
+  // grid lines
+  var steps=4;
+  ctx.strokeStyle='#252830'; ctx.lineWidth=1;
+  for(var i=0;i<=steps;i++){
+    var y=PAD.t+cH-(i/steps)*cH;
+    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(PAD.l+cW,y); ctx.stroke();
+    ctx.fillStyle='#6b7280'; ctx.font='9px sans-serif'; ctx.textAlign='right';
+    ctx.fillText(Math.round(maxVal*i/steps),PAD.l-5,y+3);
+  }
+
+  // points
+  var n=keys.length;
+  var pts=keys.map(function(k,i){
+    var x=PAD.l+(n===1?cW/2:i/(n-1)*cW);
+    var y=PAD.t+cH-(grouped[k]/maxVal)*cH;
+    return {x:x,y:y,val:grouped[k],key:k};
+  });
+
+  // area fill
+  var grad=ctx.createLinearGradient(0,PAD.t,0,PAD.t+cH);
+  grad.addColorStop(0,'rgba(79,195,247,0.25)');
+  grad.addColorStop(1,'rgba(79,195,247,0.02)');
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x,PAD.t+cH);
+  pts.forEach(function(p){ctx.lineTo(p.x,p.y);});
+  ctx.lineTo(pts[pts.length-1].x,PAD.t+cH);
+  ctx.closePath();
+  ctx.fillStyle=grad; ctx.fill();
+
+  // line
+  ctx.beginPath(); ctx.strokeStyle='#4fc3f7'; ctx.lineWidth=2; ctx.lineJoin='round';
+  pts.forEach(function(p,i){i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);});
+  ctx.stroke();
+
+  // dots + x-labels
+  var step=Math.ceil(n/20); // не больше 20 меток
+  pts.forEach(function(p,i){
+    // dot
+    ctx.beginPath(); ctx.arc(p.x,p.y,3,0,Math.PI*2);
+    ctx.fillStyle='#4fc3f7'; ctx.fill();
+
+    // x-label
+    if(i%step===0||i===n-1){
+      var lbl=formatLineKey(p.key);
+      ctx.fillStyle='#6b7280'; ctx.font='9px sans-serif'; ctx.textAlign='center';
+      ctx.fillText(lbl,p.x,H-PAD.b+14);
+    }
+  });
+
+  // tooltip on mousemove
+  canvas._pts=pts;
+  canvas.onmousemove=function(e){
+    var rect=canvas.getBoundingClientRect();
+    var mx=(e.clientX-rect.left);
+    var tip=document.getElementById('lc-tooltip');
+    var closest=null, minD=Infinity;
+    pts.forEach(function(p){
+      var d=Math.abs(p.x-mx);
+      if(d<minD){minD=d;closest=p;}
+    });
+    if(closest&&minD<20){
+      tip.style.display='block';
+      tip.style.left=(e.clientX+12)+'px';
+      tip.style.top=(e.clientY-10)+'px';
+      tip.innerHTML='<b style="color:#4fc3f7">'+formatLineKeyFull(closest.key)+'</b><br>Заданий: <b>'+closest.val+'</b>';
+    } else {
+      tip.style.display='none';
+    }
+  };
+  canvas.onmouseleave=function(){ document.getElementById('lc-tooltip').style.display='none'; };
+}
+
+function formatLineKey(k){
+  var p=k.split('-');
+  if(p.length===3) return p[2]+'.'+p[1];   // день
+  if(p.length===2) return MONTHS_SHORT[parseInt(p[1],10)-1]+' '+p[0]; // месяц
+  return k;
+}
+function formatLineKeyFull(k){
+  var p=k.split('-');
+  if(p.length===3){
+    var d=new Date(+p[0],+p[1]-1,+p[2]);
+    return p[2]+'.'+p[1]+'.'+p[0]+' ('+DOW[d.getDay()]+')';
+  }
+  if(p.length===2) return MONTHS[parseInt(p[1],10)-1]+' '+p[0];
+  return k;
 }
 
 /* ---- HEATMAP ---- */
 function renderHeatmap(rows){
-  // Строки = уникальные дни, столбцы = часы 0-23
   var days={};
   rows.forEach(function(r){
     if(!days[r.dateKey]) days[r.dateKey]={date:r.date,hours:new Array(24).fill(0)};
     days[r.dateKey].hours[r.hour]++;
   });
   var dayKeys=Object.keys(days).sort();
-  if(!dayKeys.length){
-    document.getElementById('heatmap-wrap').innerHTML='<div class="empty">Нет данных</div>';
-    return;
-  }
+  if(!dayKeys.length){ document.getElementById('heatmap-wrap').innerHTML='<div class="empty">Нет данных</div>'; return; }
 
-  // Если дней слишком много — группируем по неделям или показываем только последние 60
-  var showKeys = dayKeys;
-  if(dayKeys.length > 60) showKeys = dayKeys.slice(-60);
-
+  var showKeys=dayKeys.length>60?dayKeys.slice(-60):dayKeys;
   var maxVal=0;
-  showKeys.forEach(function(k){
-    days[k].hours.forEach(function(v){if(v>maxVal)maxVal=v;});
-  });
+  showKeys.forEach(function(k){ days[k].hours.forEach(function(v){if(v>maxVal)maxVal=v;}); });
 
   function cellColor(v){
     if(v===0) return '#1d2028';
     var t=v/maxVal;
-    if(t<0.25) return '#1a3a2a';
-    if(t<0.5)  return '#1a6b3a';
-    if(t<0.75) return '#e6a817';
+    if(t<0.2)  return '#0d3321';
+    if(t<0.4)  return '#145a32';
+    if(t<0.6)  return '#1d8348';
+    if(t<0.8)  return '#e6a817';
     return '#ff3d57';
   }
 
-  // Hour labels
   var hlHtml='<div class="hm-hour-labels">';
   for(var h=0;h<24;h++) hlHtml+='<div class="hm-hlabel">'+('0'+h).slice(-2)+'</div>';
   hlHtml+='</div>';
@@ -435,51 +690,41 @@ function renderHeatmap(rows){
   showKeys.forEach(function(k){
     var d=days[k].date;
     var label=('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+' '+DOW[d.getDay()];
-    rowsHtml+='<div class="hm-row">';
-    rowsHtml+='<div class="hm-label">'+label+'</div>';
+    rowsHtml+='<div class="hm-row"><div class="hm-label">'+label+'</div>';
     for(var h2=0;h2<24;h2++){
       var v=days[k].hours[h2];
-      var col=cellColor(v);
-      var dk2=k, hh=h2;
-      rowsHtml+='<div class="hm-cell" style="background:'+col+'" title="'+label+' '+('0'+hh).slice(-2)+':00 — '+v+' зад." onclick="showPopup(\''+dk2+'\','+hh+')">';
+      rowsHtml+='<div class="hm-cell" style="background:'+cellColor(v)+'" title="'+label+' '+('0'+h2).slice(-2)+':00 — '+v+' зад." onclick="showPopup(\''+k+'\','+h2+')">';
       if(v>0) rowsHtml+='<div class="hm-cell-val">'+v+'</div>';
       rowsHtml+='</div>';
     }
     rowsHtml+='</div>';
   });
 
-  var legend='<div class="hm-legend"><span class="hm-leg-title">Интенсивность:</span><div class="hm-leg-scale">'+
-    '<div class="hm-leg-cell" style="background:#1d2028"></div>'+
-    '<div class="hm-leg-label">0</div>'+
-    '<div class="hm-leg-cell" style="background:#1a3a2a"></div>'+
-    '<div class="hm-leg-cell" style="background:#1a6b3a"></div>'+
-    '<div class="hm-leg-label">низкая</div>'+
-    '<div class="hm-leg-cell" style="background:#e6a817"></div>'+
-    '<div class="hm-leg-label">высокая</div>'+
-    '<div class="hm-leg-cell" style="background:#ff3d57"></div>'+
-    '<div class="hm-leg-label">пик</div>'+
-    '</div>';
-  if(dayKeys.length>60) legend+='<span style="font-size:10px;color:#6b7280">Показаны последние 60 дней из '+dayKeys.length+'</span>';
-  legend+='</div>';
+  var note=dayKeys.length>60?'<span style="font-size:10px;color:#6b7280">Показаны последние 60 из '+dayKeys.length+' дней</span>':'';
+  var legend='<div class="hm-legend">'+note+'<span class="hm-leg-label">Интенсивность:</span>'+
+    '<div class="hm-leg-cell" style="background:#1d2028"></div><span class="hm-leg-label">0</span>'+
+    '<div class="hm-leg-cell" style="background:#145a32"></div>'+
+    '<div class="hm-leg-cell" style="background:#1d8348"></div><span class="hm-leg-label">низкая</span>'+
+    '<div class="hm-leg-cell" style="background:#e6a817"></div><span class="hm-leg-label">высокая</span>'+
+    '<div class="hm-leg-cell" style="background:#ff3d57"></div><span class="hm-leg-label">пик</span></div>';
 
-  document.getElementById('heatmap-wrap').innerHTML = hlHtml + rowsHtml + legend;
+  document.getElementById('heatmap-wrap').innerHTML=hlHtml+rowsHtml+legend;
 }
 
 /* ---- BAR DRILL ---- */
 function renderBarDrill(rows){
-  if(drillLevel==='top') renderBarMonths(rows);
+  if(drillLevel==='top')   renderBarMonths(rows);
   else if(drillLevel==='month') renderBarDays(rows);
   else renderBarHours(rows);
   renderBreadcrumb();
 }
 
 function renderBarMonths(rows){
-  document.getElementById('bar-title').textContent='Загрузка по месяцам — нажмите для детализации';
+  document.getElementById('bar-title').textContent='Детализация по месяцам — нажмите для провала';
   var mmap={};
   rows.forEach(function(r){
     if(!mmap[r.monthKey]) mmap[r.monthKey]={key:r.monthKey,date:r.date,count:0,hours:new Array(24).fill(0)};
-    mmap[r.monthKey].count++;
-    mmap[r.monthKey].hours[r.hour]++;
+    mmap[r.monthKey].count++; mmap[r.monthKey].hours[r.hour]++;
   });
   var months=Object.values(mmap).sort(function(a,b){return a.key>b.key?1:-1;});
   if(!months.length){document.getElementById('bar-content').innerHTML='<div class="empty">Нет данных</div>';return;}
@@ -489,54 +734,50 @@ function renderBarMonths(rows){
   months.forEach(function(m){
     var peak=m.hours.indexOf(Math.max.apply(null,m.hours));
     var p=m.key.split('-');
-    html+='<div class="m-card" onclick="drillToMonth(\''+m.key+'\')">';
-    html+='<div class="m-card-title">'+MONTHS_SHORT[parseInt(p[1],10)-1]+'</div>';
-    html+='<div class="m-card-sub">'+p[0]+'</div>';
-    html+='<div class="m-card-stat">📦 '+m.count+' заданий</div>';
     var bar=Math.round(m.count/maxC*100);
-    html+='<div style="margin-top:6px;height:4px;background:#252830;border-radius:2px"><div style="height:100%;width:'+bar+'%;background:#4fc3f7;border-radius:2px"></div></div>';
-    html+='<div class="m-card-peak">Пик: '+('0'+peak).slice(-2)+':00</div>';
-    html+='</div>';
+    html+='<div class="m-card" onclick="drillToMonth(\''+m.key+'\')">'+
+      '<div class="m-card-title">'+MONTHS_SHORT[parseInt(p[1],10)-1]+'</div>'+
+      '<div class="m-card-sub">'+p[0]+'</div>'+
+      '<div class="m-card-stat">📦 '+m.count+' заданий</div>'+
+      '<div style="margin-top:6px;height:4px;background:#252830;border-radius:2px"><div style="height:100%;width:'+bar+'%;background:#4fc3f7;border-radius:2px"></div></div>'+
+      '<div class="m-card-peak">Пик: '+('0'+peak).slice(-2)+':00</div>'+
+      '</div>';
   });
   html+='</div>';
   document.getElementById('bar-content').innerHTML=html;
 }
 
 function renderBarDays(rows){
-  document.getElementById('bar-title').textContent='Дни месяца — нажмите для детализации по часам';
+  document.getElementById('bar-title').textContent='Дни месяца — нажмите для часового профиля';
   var filtered=rows.filter(function(r){return r.monthKey===drillMonth;});
   var dmap={};
   filtered.forEach(function(r){
     if(!dmap[r.dateKey]) dmap[r.dateKey]={key:r.dateKey,date:r.date,count:0,hours:new Array(24).fill(0)};
-    dmap[r.dateKey].count++;
-    dmap[r.dateKey].hours[r.hour]++;
+    dmap[r.dateKey].count++; dmap[r.dateKey].hours[r.hour]++;
   });
   var days2=Object.values(dmap).sort(function(a,b){return a.key>b.key?1:-1;});
-  if(!days2.length){document.getElementById('bar-content').innerHTML='<div class="empty">Нет данных за этот месяц</div>';return;}
+  if(!days2.length){document.getElementById('bar-content').innerHTML='<div class="empty">Нет данных</div>';return;}
 
   var html='<div class="d-grid">';
   days2.forEach(function(d){
     var peak=d.hours.indexOf(Math.max.apply(null,d.hours));
-    var dd=('0'+d.date.getDate()).slice(-2);
-    html+='<div class="d-card" onclick="drillToDay(\''+d.key+'\')">';
-    html+='<div class="d-card-date">'+dd+'</div>';
-    html+='<div class="d-card-dow">'+DOW[d.date.getDay()]+'</div>';
-    html+='<div class="d-card-tasks">📦 '+d.count+'</div>';
-    html+='<div class="d-card-peak">Пик: '+('0'+peak).slice(-2)+':00</div>';
-    html+='</div>';
+    html+='<div class="d-card" onclick="drillToDay(\''+d.key+'\')">'+
+      '<div class="d-card-date">'+('0'+d.date.getDate()).slice(-2)+'</div>'+
+      '<div class="d-card-dow">'+DOW[d.date.getDay()]+'</div>'+
+      '<div class="d-card-tasks">📦 '+d.count+'</div>'+
+      '<div class="d-card-peak">Пик: '+('0'+peak).slice(-2)+':00</div>'+
+      '</div>';
   });
   html+='</div>';
   document.getElementById('bar-content').innerHTML=html;
 }
 
 function renderBarHours(rows){
-  var dayLabel = drillDay ? drillDay.split('-').reverse().join('.') : '—';
-  document.getElementById('bar-title').textContent='Часовой профиль — ' + dayLabel;
+  var dp=drillDay.split('-');
+  document.getElementById('bar-title').textContent='Часовой профиль — '+dp[2]+'.'+dp[1]+'.'+dp[0];
   var filtered=rows.filter(function(r){return r.dateKey===drillDay;});
   var hours=new Array(24).fill(0);
-  var tasksByHour=[];
-  for(var i=0;i<24;i++) tasksByHour.push([]);
-  filtered.forEach(function(r){hours[r.hour]++;tasksByHour[r.hour].push(r);});
+  filtered.forEach(function(r){hours[r.hour]++;});
   var maxH=Math.max.apply(null,hours)||1;
 
   function barColor(v,mx){
@@ -549,16 +790,12 @@ function renderBarHours(rows){
 
   var html='<div class="bar-wrap">';
   for(var h=0;h<24;h++){
-    var cnt=hours[h];
-    var pct=maxH>0?(cnt/maxH*100):0;
-    var col=barColor(cnt,maxH);
-    html+='<div class="bar-row" onclick="showPopup(\''+drillDay+'\','+h+')">';
-    html+='<div class="bar-label">'+('0'+h).slice(-2)+':00</div>';
-    html+='<div class="bar-bg"><div class="bar-fill" style="width:'+Math.max(pct,0)+'%;background:'+col+'">';
-    if(cnt>0&&pct>12) html+=cnt+' зад.';
-    html+='</div></div>';
-    html+='<div class="bar-val" style="color:'+(cnt>0?col:'#4b5563')+'">'+( cnt||''  )+'</div>';
-    html+='</div>';
+    var cnt=hours[h], pct=maxH>0?(cnt/maxH*100):0, col=barColor(cnt,maxH);
+    html+='<div class="bar-row" onclick="showPopup(\''+drillDay+'\','+h+')">'+
+      '<div class="bar-label">'+('0'+h).slice(-2)+':00</div>'+
+      '<div class="bar-bg"><div class="bar-fill" style="width:'+Math.max(pct,0)+'%;background:'+col+'">'+(cnt>0&&pct>12?cnt+' зад.':'')+'</div></div>'+
+      '<div class="bar-val" style="color:'+(cnt>0?col:'#4b5563')+'">'+(cnt||'')+'</div>'+
+      '</div>';
   }
   html+='</div>';
   document.getElementById('bar-content').innerHTML=html;
@@ -571,37 +808,32 @@ function renderBreadcrumb(){
     bc='<span style="color:#4fc3f7;font-weight:700">Все месяцы</span>';
   } else if(drillLevel==='month'){
     var mp=drillMonth.split('-');
-    bc='<a onclick="goTop()">Все месяцы</a> <span>›</span> <span style="color:#e8eaf0">'+MONTHS[parseInt(mp[1],10)-1]+' '+mp[0]+'</span>';
+    bc='<a onclick="goTop()">Все месяцы</a> › <span style="color:#e8eaf0">'+MONTHS[parseInt(mp[1],10)-1]+' '+mp[0]+'</span>';
   } else {
-    var mp2=drillMonth.split('-');
-    var dp=drillDay.split('-');
-    bc='<a onclick="goTop()">Все месяцы</a> <span>›</span> <a onclick="drillToMonth(\''+drillMonth+'\')">'+MONTHS[parseInt(mp2[1],10)-1]+' '+mp2[0]+'</a> <span>›</span> <span style="color:#e8eaf0">'+dp[2]+'.'+dp[1]+'.'+dp[0]+'</span>';
+    var mp2=drillMonth.split('-'); var dp2=drillDay.split('-');
+    bc='<a onclick="goTop()">Все месяцы</a> › '+
+       '<a onclick="drillToMonth(\''+drillMonth+'\')">'+MONTHS[parseInt(mp2[1],10)-1]+' '+mp2[0]+'</a> › '+
+       '<span style="color:#e8eaf0">'+dp2[2]+'.'+dp2[1]+'.'+dp2[0]+'</span>';
   }
   document.getElementById('breadcrumb').innerHTML=bc;
 }
 
-/* ---- DRILL ---- */
-function goTop(){drillLevel='top';drillMonth=null;drillDay=null;renderBarDrill(getFiltered());}
-function drillToMonth(mk){drillLevel='month';drillMonth=mk;drillDay=null;renderBarDrill(getFiltered());}
-function drillToDay(dk){
-  var mk=dk.slice(0,7);
-  drillLevel='day';drillMonth=mk;drillDay=dk;renderBarDrill(getFiltered());
-}
+function goTop(){ drillLevel='top'; drillMonth=null; drillDay=null; renderBarDrill(getFiltered()); }
+function drillToMonth(mk){ drillLevel='month'; drillMonth=mk; drillDay=null; renderBarDrill(getFiltered()); }
+function drillToDay(dk){ drillLevel='day'; drillMonth=dk.slice(0,7); drillDay=dk; renderBarDrill(getFiltered()); }
 
 /* ---- POPUP ---- */
-function showPopup(dateKey, hour){
+function showPopup(dateKey,hour){
   var rows=getFiltered().filter(function(r){return r.dateKey===dateKey&&r.hour===hour;});
   if(!rows.length) return;
   var dp=dateKey.split('-');
-  var label=dp[2]+'.'+dp[1]+'.'+dp[0]+' · '+('0'+hour).slice(-2)+':00–'+('0'+hour).slice(-2)+':59';
-  document.getElementById('popup-title').textContent='🕐 '+label+' — '+rows.length+' зад.';
+  document.getElementById('popup-title').textContent='🕐 '+dp[2]+'.'+dp[1]+'.'+dp[0]+' '+('0'+hour).slice(-2)+':00 — '+rows.length+' зад.';
   var html='<div style="overflow-x:auto"><table class="tasks-table"><thead><tr>'+
     '<th>№ задания</th><th>Дата сборки</th><th>Время</th><th>Тип доставки</th>'+
     '</tr></thead><tbody>';
   rows.sort(function(a,b){return parseInt(a.num)-parseInt(b.num);}).forEach(function(r){
     var dd=('0'+r.date.getDate()).slice(-2)+'.'+('0'+(r.date.getMonth()+1)).slice(-2)+'.'+r.date.getFullYear();
-    html+='<tr><td class="num-cell">'+r.num+'</td>'+
-      '<td class="date-cell">'+dd+'</td>'+
+    html+='<tr><td class="num-cell">'+r.num+'</td><td class="date-cell">'+dd+'</td>'+
       '<td class="date-cell">'+('0'+r.hour).slice(-2)+':xx</td>'+
       '<td class="del-cell">'+r.delivery+'</td></tr>';
   });
@@ -609,15 +841,19 @@ function showPopup(dateKey, hour){
   document.getElementById('popup-body').innerHTML=html;
   document.getElementById('popup').classList.add('on');
 }
-function closePopup(){document.getElementById('popup').classList.remove('on');}
+function closePopup(){ document.getElementById('popup').classList.remove('on'); }
 
-/* ===================== INIT ===================== */
+/* ============ INIT ============ */
+window.addEventListener('resize', function(){
+  if(allRows.length) renderLineChart(getFiltered());
+});
+
 loadData();
 setInterval(function(){
   fetchSheet().then(function(txt){
     processCSV(txt); saveCache(txt);
     setStatus('ok','Обновлено '+timeNow());
-    document.getElementById('cache-info').textContent='Кэш обновлён '+timeNow();
+    document.getElementById('cache-info').textContent='Обновлено '+timeNow();
     render();
   }).catch(function(){});
 }, 60*60*1000);
