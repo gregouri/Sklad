@@ -53,15 +53,14 @@ header{padding:12px 16px;background:#161920;border-bottom:1px solid #252830;disp
 .linechart-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;position:relative}
 canvas#lineChart{display:block}
 
-/* HEATMAP */
+/* HEATMAP — transposed: rows=hours, cols=dates */
 .heatmap-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.hm-row{display:flex;align-items:center;gap:2px;margin-bottom:2px}
-.hm-label{font-size:10px;color:#6b7280;width:58px;flex-shrink:0;text-align:right;padding-right:6px;white-space:nowrap}
-.hm-cell{width:30px;height:26px;border-radius:3px;cursor:pointer;transition:transform .1s;position:relative;flex-shrink:0}
-.hm-cell:hover{transform:scale(1.2);z-index:10}
+.hm-table{border-collapse:separate;border-spacing:2px;min-width:max-content}
+.hm-th-hour{font-size:10px;color:#6b7280;text-align:right;padding-right:6px;white-space:nowrap;width:42px;vertical-align:middle}
+.hm-th-date{font-size:9px;color:#6b7280;text-align:center;padding:2px 1px;white-space:nowrap;min-width:34px}
+.hm-cell{width:34px;height:22px;border-radius:3px;cursor:pointer;transition:transform .1s;position:relative}
+.hm-cell:hover{transform:scale(1.15);z-index:10}
 .hm-cell-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:rgba(0,0,0,.8)}
-.hm-hour-labels{display:flex;gap:2px;margin-left:64px;margin-bottom:4px}
-.hm-hlabel{width:30px;text-align:center;font-size:9px;color:#6b7280;flex-shrink:0}
 .hm-legend{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
 .hm-leg-cell{width:14px;height:14px;border-radius:2px}
 .hm-leg-label{font-size:9px;color:#6b7280}
@@ -177,13 +176,7 @@ canvas#lineChart{display:block}
   <button class="refresh-btn" onclick="loadFresh()">↻ Обновить</button>
 </div>
 
-<!-- HOUR STRIP -->
-<div class="hour-strip" id="hour-strip">
-  <div class="hs-title">⏱ Загрузка по часам: <b id="hs-period-label">все данные</b> &nbsp;·&nbsp; нажмите на час чтобы открыть задания</div>
-  <div class="hour-strip-inner" id="hs-inner">
-    <div class="loading-msg" style="padding:4px 0;font-size:11px">⏳</div>
-  </div>
-</div>
+
 
 <div class="main">
   <!-- SUMMARY -->
@@ -444,7 +437,6 @@ function getFiltered(){
 function render(){
   var rows=getFiltered();
   renderSummary(rows);
-  renderHourStrip(rows);
   renderLineChart(rows);
   renderHeatmap(rows);
   renderBarDrill(rows);
@@ -658,7 +650,7 @@ function formatLineKeyFull(k){
   return k;
 }
 
-/* ---- HEATMAP ---- */
+/* ---- HEATMAP (transposed: rows=hours, cols=dates) ---- */
 function renderHeatmap(rows){
   var days={};
   rows.forEach(function(r){
@@ -682,23 +674,29 @@ function renderHeatmap(rows){
     return '#ff3d57';
   }
 
-  var hlHtml='<div class="hm-hour-labels">';
-  for(var h=0;h<24;h++) hlHtml+='<div class="hm-hlabel">'+('0'+h).slice(-2)+'</div>';
-  hlHtml+='</div>';
-
-  var rowsHtml='';
+  // Build table: rows=hours (0-23), cols=dates
+  var html='<table class="hm-table"><thead><tr>';
+  html+='<th class="hm-th-hour">Час</th>';
   showKeys.forEach(function(k){
     var d=days[k].date;
-    var label=('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+' '+DOW[d.getDay()];
-    rowsHtml+='<div class="hm-row"><div class="hm-label">'+label+'</div>';
-    for(var h2=0;h2<24;h2++){
-      var v=days[k].hours[h2];
-      rowsHtml+='<div class="hm-cell" style="background:'+cellColor(v)+'" title="'+label+' '+('0'+h2).slice(-2)+':00 — '+v+' зад." onclick="showPopup(\''+k+'\','+h2+')">';
-      if(v>0) rowsHtml+='<div class="hm-cell-val">'+v+'</div>';
-      rowsHtml+='</div>';
-    }
-    rowsHtml+='</div>';
+    var label=('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'<br><span style="color:#4b5563">'+DOW[d.getDay()]+'</span>';
+    html+='<th class="hm-th-date">'+label+'</th>';
   });
+  html+='</tr></thead><tbody>';
+
+  for(var h=0;h<24;h++){
+    html+='<tr><td class="hm-th-hour">'+('0'+h).slice(-2)+':00</td>';
+    showKeys.forEach(function(k){
+      var v=days[k].hours[h];
+      var d=days[k].date;
+      var dlabel=('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+' '+DOW[d.getDay()];
+      html+='<td style="padding:0"><div class="hm-cell" style="background:'+cellColor(v)+'" title="'+dlabel+' '+('0'+h).slice(-2)+':00 — '+v+' зад." onclick="showPopup(\''+k+'\','+h+')">';
+      if(v>0) html+='<div class="hm-cell-val">'+v+'</div>';
+      html+='</div></td>';
+    });
+    html+='</tr>';
+  }
+  html+='</tbody></table>';
 
   var note=dayKeys.length>60?'<span style="font-size:10px;color:#6b7280">Показаны последние 60 из '+dayKeys.length+' дней</span>':'';
   var legend='<div class="hm-legend">'+note+'<span class="hm-leg-label">Интенсивность:</span>'+
@@ -708,7 +706,7 @@ function renderHeatmap(rows){
     '<div class="hm-leg-cell" style="background:#e6a817"></div><span class="hm-leg-label">высокая</span>'+
     '<div class="hm-leg-cell" style="background:#ff3d57"></div><span class="hm-leg-label">пик</span></div>';
 
-  document.getElementById('heatmap-wrap').innerHTML=hlHtml+rowsHtml+legend;
+  document.getElementById('heatmap-wrap').innerHTML=html+legend;
 }
 
 /* ---- BAR DRILL ---- */
