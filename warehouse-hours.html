@@ -177,6 +177,13 @@ canvas#lineChart{display:block}
 </div>
 
 
+<!-- HOUR STRIP -->
+<div class="hour-strip" id="hour-strip">
+  <div class="hs-title">⏱ Загрузка по часам: <b id="hs-period-label">все данные</b> &nbsp;·&nbsp; нажмите на час чтобы открыть задания</div>
+  <div class="hour-strip-inner" id="hs-inner">
+    <div class="loading-msg" style="padding:4px 0;font-size:11px">⏳</div>
+  </div>
+</div>
 
 <div class="main">
   <!-- SUMMARY -->
@@ -205,7 +212,14 @@ canvas#lineChart{display:block}
 
   <!-- HEATMAP -->
   <div class="section">
-    <div class="section-title">Тепловая карта — дни × часы <span style="font-size:10px;font-weight:400;color:#6b7280">(нажмите ячейку → список заданий)</span></div>
+    <div class="section-title">
+      <span>Тепловая карта — часы × период <span style="font-size:10px;font-weight:400;color:#6b7280;text-transform:none;letter-spacing:0">(нажмите ячейку → список заданий)</span></span>
+      <div style="display:flex;gap:8px">
+        <button class="pill on" id="hg-day"   onclick="setHeatGroup('day')"   style="padding:3px 10px">По дням</button>
+        <button class="pill"    id="hg-week"  onclick="setHeatGroup('week')"  style="padding:3px 10px">По неделям</button>
+        <button class="pill"    id="hg-month" onclick="setHeatGroup('month')" style="padding:3px 10px">По месяцам</button>
+      </div>
+    </div>
     <div class="heatmap-wrap" id="heatmap-wrap">
       <div class="loading-msg">⏳ Загрузка...</div>
     </div>
@@ -248,6 +262,7 @@ var lineGroup    = 'day';
 var drillLevel   = 'top';
 var drillMonth   = null;
 var drillDay     = null;
+var heatGroup    = 'day';
 
 var MONTHS      =['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 var MONTHS_SHORT=['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
@@ -437,6 +452,7 @@ function getFiltered(){
 function render(){
   var rows=getFiltered();
   renderSummary(rows);
+  renderHourStrip(rows);
   renderLineChart(rows);
   renderHeatmap(rows);
   renderBarDrill(rows);
@@ -650,19 +666,29 @@ function formatLineKeyFull(k){
   return k;
 }
 
-/* ---- HEATMAP (transposed: rows=hours, cols=dates) ---- */
-function renderHeatmap(rows){
-  var days={};
-  rows.forEach(function(r){
-    if(!days[r.dateKey]) days[r.dateKey]={date:r.date,hours:new Array(24).fill(0)};
-    days[r.dateKey].hours[r.hour]++;
-  });
-  var dayKeys=Object.keys(days).sort();
-  if(!dayKeys.length){ document.getElementById('heatmap-wrap').innerHTML='<div class="empty">Нет данных</div>'; return; }
+/* ---- HEATMAP (transposed: rows=hours, cols=period groups) ---- */
+function setHeatGroup(g){
+  heatGroup=g;
+  ['day','week','month'].forEach(function(v){ document.getElementById('hg-'+v).className='pill'+(v===g?' on':''); });
+  renderHeatmap(getFiltered());
+}
 
-  var showKeys=dayKeys.length>60?dayKeys.slice(-60):dayKeys;
+function renderHeatmap(rows){
+  // Group rows by heatGroup key → aggregate hours
+  var groups={};
+  rows.forEach(function(r){
+    var key = heatGroup==='month' ? r.monthKey : heatGroup==='week' ? r.weekKey : r.dateKey;
+    if(!groups[key]) groups[key]={key:key, date:r.date, hours:new Array(24).fill(0), dateKeys:{}};
+    groups[key].hours[r.hour]++;
+    groups[key].dateKeys[r.dateKey]=true;
+  });
+
+  var groupKeys=Object.keys(groups).sort();
+  if(!groupKeys.length){ document.getElementById('heatmap-wrap').innerHTML='<div class="empty">Нет данных</div>'; return; }
+
+  var showKeys=groupKeys.length>60?groupKeys.slice(-60):groupKeys;
   var maxVal=0;
-  showKeys.forEach(function(k){ days[k].hours.forEach(function(v){if(v>maxVal)maxVal=v;}); });
+  showKeys.forEach(function(k){ groups[k].hours.forEach(function(v){if(v>maxVal)maxVal=v;}); });
 
   function cellColor(v){
     if(v===0) return '#1d2028';
@@ -674,23 +700,48 @@ function renderHeatmap(rows){
     return '#ff3d57';
   }
 
-  // Build table: rows=hours (0-23), cols=dates
+  function colLabel(k){
+    var p=k.split('-');
+    if(heatGroup==='month') return MONTHS_SHORT[parseInt(p[1],10)-1]+'<br><span style="color:#4b5563">'+p[0]+'</span>';
+    if(heatGroup==='week'){
+      // week key = monday date
+      return p[2]+'.'+p[1]+'<br><span style="color:#4b5563">нед</span>';
+    }
+    // day
+    var d=groups[k].date;
+    return ('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'<br><span style="color:#4b5563">'+DOW[d.getDay()]+'</span>';
+  }
+
+  function cellTitle(k, h){
+    var p=k.split('-');
+    var periodStr='';
+    if(heatGroup==='month') periodStr=MONTHS[parseInt(p[1],10)-1]+' '+p[0];
+    else if(heatGroup==='week') periodStr='Неделя с '+p[2]+'.'+p[1]+'.'+p[0];
+    else{ var d=groups[k].date; periodStr=('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+' '+DOW[d.getDay()]; }
+    return periodStr+' '+('0'+h).slice(-2)+':00 — '+groups[k].hours[h]+' зад.';
+  }
+
+  // For click — need a representative dateKey. For day=direct, for week/month pick first dateKey
+  function clickArg(k, h){
+    if(heatGroup==='day') return "'"+k+"',"+h;
+    // for week/month we show popup with all rows in that period+hour
+    var dkeys=Object.keys(groups[k].dateKeys);
+    return "'"+dkeys[0]+"',"+h+",'"+k+"','"+heatGroup+"'";
+  }
+
+  // Build table: rows=hours (0-23), cols=groups
   var html='<table class="hm-table"><thead><tr>';
   html+='<th class="hm-th-hour">Час</th>';
   showKeys.forEach(function(k){
-    var d=days[k].date;
-    var label=('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'<br><span style="color:#4b5563">'+DOW[d.getDay()]+'</span>';
-    html+='<th class="hm-th-date">'+label+'</th>';
+    html+='<th class="hm-th-date">'+colLabel(k)+'</th>';
   });
   html+='</tr></thead><tbody>';
 
   for(var h=0;h<24;h++){
     html+='<tr><td class="hm-th-hour">'+('0'+h).slice(-2)+':00</td>';
     showKeys.forEach(function(k){
-      var v=days[k].hours[h];
-      var d=days[k].date;
-      var dlabel=('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+' '+DOW[d.getDay()];
-      html+='<td style="padding:0"><div class="hm-cell" style="background:'+cellColor(v)+'" title="'+dlabel+' '+('0'+h).slice(-2)+':00 — '+v+' зад." onclick="showPopup(\''+k+'\','+h+')">';
+      var v=groups[k].hours[h];
+      html+='<td style="padding:0"><div class="hm-cell" style="background:'+cellColor(v)+'" title="'+cellTitle(k,h)+'" onclick="showPopupGroup('+clickArg(k,h)+')">';
       if(v>0) html+='<div class="hm-cell-val">'+v+'</div>';
       html+='</div></td>';
     });
@@ -698,7 +749,7 @@ function renderHeatmap(rows){
   }
   html+='</tbody></table>';
 
-  var note=dayKeys.length>60?'<span style="font-size:10px;color:#6b7280">Показаны последние 60 из '+dayKeys.length+' дней</span>':'';
+  var note=groupKeys.length>60?'<span style="font-size:10px;color:#6b7280">Показаны последние 60 из '+groupKeys.length+' периодов</span>':'';
   var legend='<div class="hm-legend">'+note+'<span class="hm-leg-label">Интенсивность:</span>'+
     '<div class="hm-leg-cell" style="background:#1d2028"></div><span class="hm-leg-label">0</span>'+
     '<div class="hm-leg-cell" style="background:#145a32"></div>'+
@@ -840,6 +891,37 @@ function showPopup(dateKey,hour){
   document.getElementById('popup').classList.add('on');
 }
 function closePopup(){ document.getElementById('popup').classList.remove('on'); }
+
+function showPopupGroup(dateKey, hour, groupKey, groupType){
+  // If no groupKey, fall back to regular showPopup
+  if(!groupKey){ showPopup(dateKey, hour); return; }
+  // Aggregate all rows matching this period group + hour
+  var filtered=getFiltered();
+  var rows=filtered.filter(function(r){
+    if(r.hour!==hour) return false;
+    if(groupType==='week') return r.weekKey===groupKey;
+    if(groupType==='month') return r.monthKey===groupKey;
+    return r.dateKey===groupKey;
+  });
+  if(!rows.length) return;
+  var p=groupKey.split('-');
+  var periodStr=groupType==='month'
+    ? MONTHS[parseInt(p[1],10)-1]+' '+p[0]
+    : 'Неделя с '+p[2]+'.'+p[1]+'.'+p[0];
+  document.getElementById('popup-title').textContent='🕐 '+periodStr+' '+('0'+hour).slice(-2)+':00 — '+rows.length+' зад.';
+  var html='<div style="overflow-x:auto"><table class="tasks-table"><thead><tr>'+
+    '<th>№ задания</th><th>Дата сборки</th><th>Время</th><th>Тип доставки</th>'+
+    '</tr></thead><tbody>';
+  rows.sort(function(a,b){return parseInt(a.num)-parseInt(b.num);}).forEach(function(r){
+    var dd=('0'+r.date.getDate()).slice(-2)+'.'+('0'+(r.date.getMonth()+1)).slice(-2)+'.'+r.date.getFullYear();
+    html+='<tr><td class="num-cell">'+r.num+'</td><td class="date-cell">'+dd+'</td>'+
+      '<td class="date-cell">'+('0'+r.hour).slice(-2)+':xx</td>'+
+      '<td class="del-cell">'+r.delivery+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+  document.getElementById('popup-body').innerHTML=html;
+  document.getElementById('popup').classList.add('on');
+}
 
 /* ============ INIT ============ */
 window.addEventListener('resize', function(){
