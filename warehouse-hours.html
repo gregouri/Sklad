@@ -154,6 +154,7 @@ canvas#lineChart{display:block}
     <button class="pill on" id="fp-all"   onclick="setPeriod('all')">Всё время</button>
     <button class="pill"    id="fp-month" onclick="setPeriod('month')">Этот месяц</button>
     <button class="pill"    id="fp-week"  onclick="setPeriod('week')">7 дней</button>
+    <button class="pill"    id="fp-day"   onclick="setPeriod('day')">1 день</button>
   </div>
   <div class="sep"></div>
   <!-- Произвольный диапазон -->
@@ -195,18 +196,13 @@ canvas#lineChart{display:block}
     <div class="si"><div class="sn" style="color:#4fc3f7" id="s-busiest">—</div><div class="sd">загруженный день</div></div>
   </div>
 
-  <!-- LINE CHART -->
+  <!-- AUTHORS HEATMAP -->
   <div class="section">
     <div class="section-title">
-      <span id="line-title">Динамика заданий по дням</span>
-      <div style="display:flex;gap:8px">
-        <button class="pill on" id="lg-day"   onclick="setLineGroup('day')"   style="padding:3px 10px">По дням</button>
-        <button class="pill"    id="lg-week"  onclick="setLineGroup('week')"  style="padding:3px 10px">По неделям</button>
-        <button class="pill"    id="lg-month" onclick="setLineGroup('month')" style="padding:3px 10px">По месяцам</button>
-      </div>
+      <span>Загрузка по авторам — часы × автор <span style="font-size:10px;font-weight:400;color:#6b7280;text-transform:none;letter-spacing:0">(нажмите ячейку → список заданий)</span></span>
     </div>
-    <div class="linechart-wrap">
-      <canvas id="lineChart" height="180"></canvas>
+    <div class="heatmap-wrap" id="authors-heatmap-wrap">
+      <div class="loading-msg">⏳ Загрузка...</div>
     </div>
   </div>
 
@@ -357,10 +353,13 @@ function processCSV(txt){
     var line=lines[i].trim(); if(!line) continue;
     var c=parseCSVLine(line);
     var num=c[0], dateRaw=c[6], timeRaw=c[7], delivery=(c[8]||'').trim()||'—';
+    var author=(c[9]||'').trim()||'';   // колонка Автор (J, индекс 9)
+    var shipDateRaw=(c[3]||'').trim();  // колонка Дата отгрузки (D, индекс 3)
     if(!num||!dateRaw||!timeRaw) continue;
     var d=parseDate(dateRaw); if(!d) continue;
     var hour=parseHour(timeRaw); if(hour===null) continue;
-    allRows.push({num:num,date:d,dateKey:dkey(d),monthKey:mkey(d),weekKey:wkey(d),hour:hour,delivery:delivery});
+    var shipDate=parseDate(shipDateRaw);
+    allRows.push({num:num,date:d,dateKey:dkey(d),monthKey:mkey(d),weekKey:wkey(d),hour:hour,delivery:delivery,author:author,shipDate:shipDate});
   }
   buildDeliveryPills();
   setDateBounds();
@@ -390,7 +389,7 @@ function applyDateRange(){
   if(dateTo) dateTo.setHours(23,59,59,999);
   // сбрасываем pill-период
   activePeriod='custom';
-  ['all','month','week'].forEach(function(v){ document.getElementById('fp-'+v).className='pill'; });
+  ['all','month','week','day'].forEach(function(v){ document.getElementById('fp-'+v).className='pill'; });
   drillLevel='top'; drillMonth=null; drillDay=null;
   render();
 }
@@ -406,7 +405,7 @@ function setPeriod(p){
   activePeriod=p; dateFrom=null; dateTo=null;
   document.getElementById('date-from').value='';
   document.getElementById('date-to').value='';
-  ['all','month','week'].forEach(function(v){
+  ['all','month','week','day'].forEach(function(v){
     document.getElementById('fp-'+v).className='pill'+(v===p?' on':'');
   });
   drillLevel='top'; drillMonth=null; drillDay=null;
@@ -439,6 +438,8 @@ function getFiltered(){
       var n=new Date(); if(r.date.getFullYear()!==n.getFullYear()||r.date.getMonth()!==n.getMonth()) return false;
     } else if(activePeriod==='week'){
       var diff=(now-r.date)/86400000; if(diff<0||diff>7) return false;
+    } else if(activePeriod==='day'){
+      var diff2=(now-r.date)/86400000; if(diff2<0||diff2>1) return false;
     } else if(activePeriod==='custom'){
       if(dateFrom&&r.date<dateFrom) return false;
       if(dateTo&&r.date>dateTo) return false;
@@ -478,6 +479,7 @@ function renderHourStrip(rows){
   var pLabel='все данные';
   if(activePeriod==='month') pLabel='этот месяц';
   else if(activePeriod==='week') pLabel='7 дней';
+  else if(activePeriod==='day') pLabel='сегодня';
   else if(activePeriod==='custom'){
     var f=document.getElementById('date-from').value;
     var t=document.getElementById('date-to').value;
@@ -540,130 +542,116 @@ function renderSummary(rows){
   document.getElementById('s-busiest').textContent=busiestLabel;
 }
 
-/* ---- LINE CHART (Canvas) ---- */
-function setLineGroup(g){
-  lineGroup=g;
-  ['day','week','month'].forEach(function(v){ document.getElementById('lg-'+v).className='pill'+(v===g?' on':''); });
-  renderLineChart(getFiltered());
-}
-
+/* ---- AUTHORS HEATMAP: rows=hours(0-23), cols=authors ---- */
 function renderLineChart(rows){
-  var canvas=document.getElementById('lineChart');
-  var wrap=canvas.parentElement;
-  var dpr=window.devicePixelRatio||1;
+  renderAuthorsHeatmap(rows);
+}
 
-  // группируем
-  var grouped={};
+function renderAuthorsHeatmap(rows){
+  var wrap=document.getElementById('authors-heatmap-wrap');
+  if(!wrap) return;
+
+  // Build author → hours[24] map
+  var authorMap={};
   rows.forEach(function(r){
-    var key=lineGroup==='month'?r.monthKey:lineGroup==='week'?r.weekKey:r.dateKey;
-    grouped[key]=(grouped[key]||0)+1;
+    if(!r.author) return;
+    if(!authorMap[r.author]) authorMap[r.author]=new Array(24).fill(0);
+    authorMap[r.author][r.hour]++;
   });
-  var keys=Object.keys(grouped).sort();
-  if(!keys.length){ canvas.style.display='none'; return; }
-  canvas.style.display='block';
 
-  var vals=keys.map(function(k){return grouped[k];});
-  var maxVal=Math.max.apply(null,vals)||1;
+  var authors=Object.keys(authorMap).sort(function(a,b){
+    var ta=authorMap[a].reduce(function(s,v){return s+v;},0);
+    var tb=authorMap[b].reduce(function(s,v){return s+v;},0);
+    return tb-ta;
+  });
 
-  // ширина — минимум контейнер, но не меньше чем нужно для всех точек
-  var minW=Math.max(wrap.clientWidth||600, keys.length*28+80);
-  var W=minW, H=180;
-  canvas.width=W*dpr; canvas.height=H*dpr;
-  canvas.style.width=W+'px'; canvas.style.height=H+'px';
-
-  var ctx=canvas.getContext('2d');
-  ctx.scale(dpr,dpr);
-  ctx.clearRect(0,0,W,H);
-
-  var PAD={t:20,r:20,b:36,l:46};
-  var cW=W-PAD.l-PAD.r, cH=H-PAD.t-PAD.b;
-
-  // grid lines
-  var steps=4;
-  ctx.strokeStyle='#252830'; ctx.lineWidth=1;
-  for(var i=0;i<=steps;i++){
-    var y=PAD.t+cH-(i/steps)*cH;
-    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(PAD.l+cW,y); ctx.stroke();
-    ctx.fillStyle='#6b7280'; ctx.font='9px sans-serif'; ctx.textAlign='right';
-    ctx.fillText(Math.round(maxVal*i/steps),PAD.l-5,y+3);
+  if(!authors.length){
+    wrap.innerHTML='<div class="empty">Нет данных об авторах (добавьте колонку Автор в таблицу)</div>';
+    return;
   }
 
-  // points
-  var n=keys.length;
-  var pts=keys.map(function(k,i){
-    var x=PAD.l+(n===1?cW/2:i/(n-1)*cW);
-    var y=PAD.t+cH-(grouped[k]/maxVal)*cH;
-    return {x:x,y:y,val:grouped[k],key:k};
+  var maxVal=0;
+  authors.forEach(function(a){
+    authorMap[a].forEach(function(v){ if(v>maxVal) maxVal=v; });
   });
 
-  // area fill
-  var grad=ctx.createLinearGradient(0,PAD.t,0,PAD.t+cH);
-  grad.addColorStop(0,'rgba(79,195,247,0.25)');
-  grad.addColorStop(1,'rgba(79,195,247,0.02)');
-  ctx.beginPath();
-  ctx.moveTo(pts[0].x,PAD.t+cH);
-  pts.forEach(function(p){ctx.lineTo(p.x,p.y);});
-  ctx.lineTo(pts[pts.length-1].x,PAD.t+cH);
-  ctx.closePath();
-  ctx.fillStyle=grad; ctx.fill();
+  function cellColor(v){
+    if(v===0) return '#1d2028';
+    var t=v/maxVal;
+    if(t<0.2) return '#0d3321';
+    if(t<0.4) return '#145a32';
+    if(t<0.6) return '#1d8348';
+    if(t<0.8) return '#e6a817';
+    return '#ff3d57';
+  }
 
-  // line
-  ctx.beginPath(); ctx.strokeStyle='#4fc3f7'; ctx.lineWidth=2; ctx.lineJoin='round';
-  pts.forEach(function(p,i){i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);});
-  ctx.stroke();
-
-  // dots + x-labels
-  var step=Math.ceil(n/20); // не больше 20 меток
-  pts.forEach(function(p,i){
-    // dot
-    ctx.beginPath(); ctx.arc(p.x,p.y,3,0,Math.PI*2);
-    ctx.fillStyle='#4fc3f7'; ctx.fill();
-
-    // x-label
-    if(i%step===0||i===n-1){
-      var lbl=formatLineKey(p.key);
-      ctx.fillStyle='#6b7280'; ctx.font='9px sans-serif'; ctx.textAlign='center';
-      ctx.fillText(lbl,p.x,H-PAD.b+14);
-    }
+  // Table: rows=hours, cols=authors
+  var html='<table class="hm-table"><thead><tr>';
+  html+='<th class="hm-th-hour">Час</th>';
+  authors.forEach(function(a){
+    var parts=a.split(' ');
+    var ln=parts[0]||a;
+    var fn=parts[1]||'';
+    html+='<th class="hm-th-date" style="min-width:52px;max-width:70px;white-space:normal;word-break:break-word;font-size:9px;line-height:1.3">'+
+      '<span style="color:#e8eaf0;font-weight:700">'+ln+'</span>'+
+      (fn?'<br><span style="color:#6b7280">'+fn+'</span>':'')+
+      '</th>';
   });
+  html+='</tr></thead><tbody>';
 
-  // tooltip on mousemove
-  canvas._pts=pts;
-  canvas.onmousemove=function(e){
-    var rect=canvas.getBoundingClientRect();
-    var mx=(e.clientX-rect.left);
-    var tip=document.getElementById('lc-tooltip');
-    var closest=null, minD=Infinity;
-    pts.forEach(function(p){
-      var d=Math.abs(p.x-mx);
-      if(d<minD){minD=d;closest=p;}
+  for(var h=0;h<24;h++){
+    html+='<tr><td class="hm-th-hour">'+('0'+h).slice(-2)+':00</td>';
+    authors.forEach(function(a){
+      var v=authorMap[a][h];
+      var total=authorMap[a].reduce(function(s,x){return s+x;},0);
+      var title=a+' '+('0'+h).slice(-2)+':00 — '+v+' зад.';
+      html+='<td style="padding:0"><div class="hm-cell" style="background:'+cellColor(v)+';width:52px" title="'+title+'" onclick="showAuthorHourPopup(\''+a.replace(/'/g,"\\'")+"',"+h+')">';
+      if(v>0) html+='<div class="hm-cell-val">'+v+'</div>';
+      html+='</div></td>';
     });
-    if(closest&&minD<20){
-      tip.style.display='block';
-      tip.style.left=(e.clientX+12)+'px';
-      tip.style.top=(e.clientY-10)+'px';
-      tip.innerHTML='<b style="color:#4fc3f7">'+formatLineKeyFull(closest.key)+'</b><br>Заданий: <b>'+closest.val+'</b>';
-    } else {
-      tip.style.display='none';
-    }
-  };
-  canvas.onmouseleave=function(){ document.getElementById('lc-tooltip').style.display='none'; };
+    html+='</tr>';
+  }
+  html+='</tbody></table>';
+
+  // Legend + totals row
+  var totalsRow='<div style="margin-top:10px;display:flex;gap:3px;flex-wrap:wrap">';
+  authors.forEach(function(a){
+    var total=authorMap[a].reduce(function(s,v){return s+v;},0);
+    var parts=a.split(' ');
+    totalsRow+='<div style="background:#1d2028;border:1px solid #252830;border-radius:4px;padding:3px 6px;font-size:9px;text-align:center;min-width:52px">'+
+      '<div style="color:#4fc3f7;font-weight:700">'+total+'</div>'+
+      '<div style="color:#6b7280">всего</div></div>';
+  });
+  totalsRow+='</div>';
+
+  var legend='<div class="hm-legend"><span class="hm-leg-label">Интенсивность:</span>'+
+    '<div class="hm-leg-cell" style="background:#1d2028"></div><span class="hm-leg-label">0</span>'+
+    '<div class="hm-leg-cell" style="background:#145a32"></div>'+
+    '<div class="hm-leg-cell" style="background:#1d8348"></div><span class="hm-leg-label">низкая</span>'+
+    '<div class="hm-leg-cell" style="background:#e6a817"></div><span class="hm-leg-label">высокая</span>'+
+    '<div class="hm-leg-cell" style="background:#ff3d57"></div><span class="hm-leg-label">пик</span></div>';
+
+  wrap.innerHTML=html+totalsRow+legend;
 }
 
-function formatLineKey(k){
-  var p=k.split('-');
-  if(p.length===3) return p[2]+'.'+p[1];   // день
-  if(p.length===2) return MONTHS_SHORT[parseInt(p[1],10)-1]+' '+p[0]; // месяц
-  return k;
-}
-function formatLineKeyFull(k){
-  var p=k.split('-');
-  if(p.length===3){
-    var d=new Date(+p[0],+p[1]-1,+p[2]);
-    return p[2]+'.'+p[1]+'.'+p[0]+' ('+DOW[d.getDay()]+')';
-  }
-  if(p.length===2) return MONTHS[parseInt(p[1],10)-1]+' '+p[0];
-  return k;
+function showAuthorHourPopup(author, hour){
+  var rows=getFiltered().filter(function(r){ return r.author===author && r.hour===hour; });
+  if(!rows.length) return;
+  document.getElementById('popup-title').textContent='👤 '+author+' — '+('0'+hour).slice(-2)+':00 — '+rows.length+' зад.';
+  var html='<div style="overflow-x:auto"><table class="tasks-table"><thead><tr>'+
+    '<th>№ задания</th><th>Дата сборки</th><th>Дата отгрузки</th><th>Время</th><th>Тип доставки</th>'+
+    '</tr></thead><tbody>';
+  rows.sort(function(a,b){return parseInt(a.num)-parseInt(b.num);}).forEach(function(r){
+    var dd=('0'+r.date.getDate()).slice(-2)+'.'+('0'+(r.date.getMonth()+1)).slice(-2)+'.'+r.date.getFullYear();
+    var sd=r.shipDate?('0'+r.shipDate.getDate()).slice(-2)+'.'+('0'+(r.shipDate.getMonth()+1)).slice(-2)+'.'+r.shipDate.getFullYear():'—';
+    html+='<tr><td class="num-cell">'+r.num+'</td><td class="date-cell">'+dd+'</td>'+
+      '<td class="date-cell" style="color:#00e676">'+sd+'</td>'+
+      '<td class="date-cell">'+('0'+r.hour).slice(-2)+':xx</td>'+
+      '<td class="del-cell">'+r.delivery+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+  document.getElementById('popup-body').innerHTML=html;
+  document.getElementById('popup').classList.add('on');
 }
 
 /* ---- HEATMAP (transposed: rows=hours, cols=period groups) ---- */
@@ -878,13 +866,16 @@ function showPopup(dateKey,hour){
   var dp=dateKey.split('-');
   document.getElementById('popup-title').textContent='🕐 '+dp[2]+'.'+dp[1]+'.'+dp[0]+' '+('0'+hour).slice(-2)+':00 — '+rows.length+' зад.';
   var html='<div style="overflow-x:auto"><table class="tasks-table"><thead><tr>'+
-    '<th>№ задания</th><th>Дата сборки</th><th>Время</th><th>Тип доставки</th>'+
+    '<th>№ задания</th><th>Дата сборки</th><th>Дата отгрузки</th><th>Время</th><th>Тип доставки</th><th>Автор</th>'+
     '</tr></thead><tbody>';
   rows.sort(function(a,b){return parseInt(a.num)-parseInt(b.num);}).forEach(function(r){
     var dd=('0'+r.date.getDate()).slice(-2)+'.'+('0'+(r.date.getMonth()+1)).slice(-2)+'.'+r.date.getFullYear();
+    var sd=r.shipDate?('0'+r.shipDate.getDate()).slice(-2)+'.'+('0'+(r.shipDate.getMonth()+1)).slice(-2)+'.'+r.shipDate.getFullYear():'—';
     html+='<tr><td class="num-cell">'+r.num+'</td><td class="date-cell">'+dd+'</td>'+
+      '<td class="date-cell" style="color:#00e676">'+sd+'</td>'+
       '<td class="date-cell">'+('0'+r.hour).slice(-2)+':xx</td>'+
-      '<td class="del-cell">'+r.delivery+'</td></tr>';
+      '<td class="del-cell">'+r.delivery+'</td>'+
+      '<td style="font-size:11px;color:#4fc3f7">'+r.author+'</td></tr>';
   });
   html+='</tbody></table></div>';
   document.getElementById('popup-body').innerHTML=html;
@@ -910,13 +901,16 @@ function showPopupGroup(dateKey, hour, groupKey, groupType){
     : 'Неделя с '+p[2]+'.'+p[1]+'.'+p[0];
   document.getElementById('popup-title').textContent='🕐 '+periodStr+' '+('0'+hour).slice(-2)+':00 — '+rows.length+' зад.';
   var html='<div style="overflow-x:auto"><table class="tasks-table"><thead><tr>'+
-    '<th>№ задания</th><th>Дата сборки</th><th>Время</th><th>Тип доставки</th>'+
+    '<th>№ задания</th><th>Дата сборки</th><th>Дата отгрузки</th><th>Время</th><th>Тип доставки</th><th>Автор</th>'+
     '</tr></thead><tbody>';
   rows.sort(function(a,b){return parseInt(a.num)-parseInt(b.num);}).forEach(function(r){
     var dd=('0'+r.date.getDate()).slice(-2)+'.'+('0'+(r.date.getMonth()+1)).slice(-2)+'.'+r.date.getFullYear();
+    var sd=r.shipDate?('0'+r.shipDate.getDate()).slice(-2)+'.'+('0'+(r.shipDate.getMonth()+1)).slice(-2)+'.'+r.shipDate.getFullYear():'—';
     html+='<tr><td class="num-cell">'+r.num+'</td><td class="date-cell">'+dd+'</td>'+
+      '<td class="date-cell" style="color:#00e676">'+sd+'</td>'+
       '<td class="date-cell">'+('0'+r.hour).slice(-2)+':xx</td>'+
-      '<td class="del-cell">'+r.delivery+'</td></tr>';
+      '<td class="del-cell">'+r.delivery+'</td>'+
+      '<td style="font-size:11px;color:#4fc3f7">'+r.author+'</td></tr>';
   });
   html+='</tbody></table></div>';
   document.getElementById('popup-body').innerHTML=html;
