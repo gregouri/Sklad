@@ -357,6 +357,13 @@ function slotLabel(slot){
   return ('0'+h).slice(-2)+':'+('0'+m).slice(-2);
 }
 function slotIsHalf(slot){ return slot%2===1; }
+/* первый и последний интервал, в котором есть задания (массив счётчиков длиной SLOTS) */
+function slotRangeFromCounts(arr){
+  var lo=-1,hi=-1;
+  for(var i=0;i<arr.length;i++){ if(arr[i]>0){ if(lo<0)lo=i; hi=i; } }
+  if(lo<0) return {lo:0,hi:-1}; // нет данных — пустой диапазон
+  return {lo:lo,hi:hi};
+}
 
 /* ============ DATA ============ */
 function loadData(){
@@ -587,7 +594,8 @@ function renderHourStrip(rows){
   document.getElementById('hs-period-label').textContent=pLabel;
 
   var html='';
-  for(var sl=0;sl<SLOTS;sl++){
+  var rng=slotRangeFromCounts(slots);
+  for(var sl=rng.lo;sl<=rng.hi;sl++){
     var cnt=slots[sl];
     var pct=Math.round(cnt/total*100);
     var t=cnt/maxH;
@@ -699,7 +707,11 @@ function renderAuthorsHeatmap(rows){
   });
   html+='</tr></thead><tbody>';
 
-  for(var sl=0;sl<SLOTS;sl++){
+  var combinedA=new Array(SLOTS).fill(0);
+  authors.forEach(function(a){ authorMap[a].forEach(function(v,i){ combinedA[i]+=v; }); });
+  var rngA=slotRangeFromCounts(combinedA);
+
+  for(var sl=rngA.lo;sl<=rngA.hi;sl++){
     var rowCls=slotIsHalf(sl)?' class="hm-row-half"':'';
     html+='<tr'+rowCls+'><td class="hm-th-hour">'+slotLabel(sl)+'</td>';
     authors.forEach(function(a){
@@ -820,7 +832,11 @@ function renderHeatmap(rows){
   });
   html+='</tr></thead><tbody>';
 
-  for(var sl=0;sl<SLOTS;sl++){
+  var combinedH=new Array(SLOTS).fill(0);
+  showKeys.forEach(function(k){ groups[k].slots.forEach(function(v,i){ combinedH[i]+=v; }); });
+  var rngH=slotRangeFromCounts(combinedH);
+
+  for(var sl=rngH.lo;sl<=rngH.hi;sl++){
     var rowCls=slotIsHalf(sl)?' class="hm-row-half"':'';
     html+='<tr'+rowCls+'><td class="hm-th-hour">'+slotLabel(sl)+'</td>';
     showKeys.forEach(function(k){
@@ -922,7 +938,8 @@ function renderBarHours(rows){
   }
 
   var html='<div class="bar-wrap">';
-  for(var sl=0;sl<SLOTS;sl++){
+  var rngB=slotRangeFromCounts(slots);
+  for(var sl=rngB.lo;sl<=rngB.hi;sl++){
     var cnt=slots[sl], pct=maxH>0?(cnt/maxH*100):0, col=barColor(cnt,maxH);
     var rowCls=slotIsHalf(sl)?' half':'';
     html+='<div class="bar-row'+rowCls+'" onclick="showPopup(\''+drillDay+'\','+sl+')">'+
