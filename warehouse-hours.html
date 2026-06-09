@@ -28,6 +28,10 @@ header{padding:12px 16px;background:#f8fafc;border-bottom:1px solid #d7dee8;disp
 .refresh-btn{padding:5px 12px;background:#d7dee8;border:none;color:#0284c7;font-size:11px;font-weight:700;border-radius:20px;cursor:pointer}
 .refresh-btn:hover{background:#cbd5e1}
 
+/* MEMO BUTTON */
+.memo-btn{padding:6px 14px;background:#6d28d9;color:#fff;border:none;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 1px 2px rgba(15,23,42,.12)}
+.memo-btn:hover{background:#5b21b6}
+
 /* DATE RANGE */
 .date-range{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .date-inp{padding:4px 8px;background:#ffffff;border:1px solid #d7dee8;color:#111827;border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer}
@@ -53,12 +57,13 @@ header{padding:12px 16px;background:#f8fafc;border-bottom:1px solid #d7dee8;disp
 .linechart-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;position:relative}
 canvas#lineChart{display:block}
 
-/* HEATMAP — transposed: rows=hours, cols=dates */
+/* HEATMAP — transposed: rows=slots, cols=dates */
 .heatmap-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .hm-table{border-collapse:separate;border-spacing:2px;min-width:max-content}
-.hm-th-hour{font-size:10px;color:#64748b;text-align:right;padding-right:6px;white-space:nowrap;width:42px;vertical-align:middle}
+.hm-th-hour{font-size:10px;color:#64748b;text-align:right;padding-right:6px;white-space:nowrap;width:48px;vertical-align:middle}
+.hm-row-half .hm-th-hour{color:#94a3b8;font-size:9px}
 .hm-th-date{font-size:9px;color:#64748b;text-align:center;padding:2px 1px;white-space:nowrap;min-width:34px}
-.hm-cell{width:34px;height:22px;border-radius:3px;cursor:pointer;transition:transform .1s;position:relative}
+.hm-cell{width:34px;height:18px;border-radius:3px;cursor:pointer;transition:transform .1s;position:relative}
 .hm-cell:hover{transform:scale(1.15);z-index:10}
 .hm-cell-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:rgba(15,23,42,.85)}
 .hm-legend{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
@@ -66,11 +71,12 @@ canvas#lineChart{display:block}
 .hm-leg-label{font-size:9px;color:#64748b}
 
 /* BAR DRILL */
-.bar-wrap{display:flex;flex-direction:column;gap:4px}
+.bar-wrap{display:flex;flex-direction:column;gap:3px}
 .bar-row{display:flex;align-items:center;gap:8px;cursor:pointer}
 .bar-row:hover .bar-fill{filter:brightness(1.2)}
-.bar-label{font-size:11px;color:#475569;width:44px;text-align:right;flex-shrink:0}
-.bar-bg{flex:1;height:24px;background:#e2e8f0;border-radius:3px;overflow:hidden}
+.bar-row.half .bar-label{color:#94a3b8;font-size:10px}
+.bar-label{font-size:11px;color:#475569;width:52px;text-align:right;flex-shrink:0}
+.bar-bg{flex:1;height:20px;background:#e2e8f0;border-radius:3px;overflow:hidden}
 .bar-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:700;color:rgba(15,23,42,.85);white-space:nowrap;transition:width .4s}
 .bar-val{font-size:11px;font-weight:700;width:40px;text-align:right;flex-shrink:0}
 
@@ -117,12 +123,12 @@ canvas#lineChart{display:block}
 
 /* HOUR STRIP */
 .hour-strip{background:#f8fafc;border-bottom:1px solid #d7dee8;padding:8px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.hour-strip-inner{display:flex;gap:3px;min-width:max-content;align-items:flex-end;height:54px}
+.hour-strip-inner{display:flex;gap:2px;min-width:max-content;align-items:flex-end;height:54px}
 .hs-col{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;position:relative}
 .hs-col:hover .hs-bar{filter:brightness(1.3)}
 .hs-col:hover .hs-tooltip{display:block}
-.hs-bar{border-radius:3px 3px 0 0;width:28px;transition:height .35s,background .35s;min-height:2px}
-.hs-pct{font-size:8px;color:#475569;line-height:1;white-space:nowrap}
+.hs-bar{border-radius:3px 3px 0 0;width:18px;transition:height .35s,background .35s;min-height:2px}
+.hs-pct{font-size:7px;color:#475569;line-height:1;white-space:nowrap}
 .hs-lbl{font-size:8px;color:#64748b;white-space:nowrap}
 .hs-tooltip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#e2e8f0;border:1px solid #0284c7;border-radius:5px;padding:5px 8px;font-size:10px;white-space:nowrap;z-index:200;line-height:1.5;pointer-events:none}
 .hs-title{font-size:10px;color:#64748b;margin-bottom:4px;display:flex;align-items:center;gap:8px}
@@ -131,6 +137,20 @@ canvas#lineChart{display:block}
 /* TOOLTIP */
 .lc-tooltip{position:fixed;background:#e2e8f0;border:1px solid #0284c7;border-radius:6px;padding:8px 12px;font-size:11px;pointer-events:none;z-index:100;display:none;line-height:1.6;min-width:120px}
 
+/* MEMO MODAL */
+.memo-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:399;align-items:flex-end;justify-content:center}
+.memo-overlay.on{display:flex}
+.memo-modal{background:#fff;border-radius:12px 12px 0 0;padding:22px;width:100%;max-width:760px;max-height:86vh;overflow-y:auto;box-shadow:0 -8px 30px rgba(15,23,42,.18)}
+.memo-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.memo-hdr h2{font-size:18px;color:#0284c7}
+.memo-close{background:none;border:none;color:#64748b;font-size:24px;cursor:pointer;line-height:1}
+.memo-body{font-size:13px;color:#1f2937;line-height:1.6}
+.memo-body p{margin:6px 0}
+.memo-rule{background:#f1f5f9;border:1px solid #e5e7eb;border-left:3px solid #6d28d9;border-radius:6px;padding:11px 13px;margin:11px 0}
+.memo-rule b{color:#111827;display:block;margin-bottom:4px;font-size:13px}
+.memo-rule ul{margin:4px 0 0 18px}
+.memo-rule li{margin:2px 0}
+.memo-rule .col{color:#0284c7;font-weight:700}
 
 /* Светлая тема: дополнительные правки читаемости */
 .card, .section, .si, .m-card, .d-card, .popup, header, .toolbar, .hour-strip{box-shadow:0 1px 2px rgba(15,23,42,.04)}
@@ -148,8 +168,9 @@ canvas#lineChart{display:block}
 <header>
   <div>
     <div class="logo">📊 ЗАГРУЗКА ПО ЧАСАМ</div>
-    <div class="sub">МОНИТОРИНГ ЧАСОВОЙ ИНТЕНСИВНОСТИ СКЛАДА</div>
+    <div class="sub">МОНИТОРИНГ ПОЛУЧАСОВОЙ ИНТЕНСИВНОСТИ СКЛАДА</div>
   </div>
+  <button class="memo-btn" onclick="document.getElementById('memo-overlay').classList.add('on')">📋 Памятка</button>
   <div style="display:flex;align-items:center;gap:8px">
     <span class="cache-badge" id="cache-info">—</span>
     <span style="font-size:11px;color:#64748b;display:flex;align-items:center">
@@ -191,7 +212,7 @@ canvas#lineChart{display:block}
 
 <!-- HOUR STRIP -->
 <div class="hour-strip" id="hour-strip">
-  <div class="hs-title">⏱ Загрузка по часам: <b id="hs-period-label">все данные</b> &nbsp;·&nbsp; нажмите на час чтобы открыть задания</div>
+  <div class="hs-title">⏱ Загрузка по получасам: <b id="hs-period-label">все данные</b> &nbsp;·&nbsp; нажмите на интервал чтобы открыть задания</div>
   <div class="hour-strip-inner" id="hs-inner">
     <div class="loading-msg" style="padding:4px 0;font-size:11px">⏳</div>
   </div>
@@ -202,7 +223,7 @@ canvas#lineChart{display:block}
   <div class="summary">
     <div class="si"><div class="sn" id="s-total">—</div><div class="sd">заданий</div></div>
     <div class="si"><div class="sn" id="s-days">—</div><div class="sd">рабочих дней</div></div>
-    <div class="si"><div class="sn" style="color:#ca8a04" id="s-peak-hour">—</div><div class="sd">час-пик</div></div>
+    <div class="si"><div class="sn" style="color:#ca8a04" id="s-peak-hour">—</div><div class="sd">пик-интервал</div></div>
     <div class="si"><div class="sn" style="color:#16a34a" id="s-avg">—</div><div class="sd">сред/день</div></div>
     <div class="si"><div class="sn" style="color:#0284c7" id="s-busiest">—</div><div class="sd">загруженный день</div></div>
   </div>
@@ -210,7 +231,7 @@ canvas#lineChart{display:block}
   <!-- AUTHORS HEATMAP -->
   <div class="section">
     <div class="section-title">
-      <span>Загрузка по авторам — часы × автор <span style="font-size:10px;font-weight:400;color:#64748b;text-transform:none;letter-spacing:0">(нажмите ячейку → список заданий)</span></span>
+      <span>Загрузка по авторам — получасы × автор <span style="font-size:10px;font-weight:400;color:#64748b;text-transform:none;letter-spacing:0">(нажмите ячейку → список заданий)</span></span>
     </div>
     <div class="heatmap-wrap" id="authors-heatmap-wrap">
       <div class="loading-msg">⏳ Загрузка...</div>
@@ -220,7 +241,7 @@ canvas#lineChart{display:block}
   <!-- HEATMAP -->
   <div class="section">
     <div class="section-title">
-      <span>Тепловая карта — часы × период <span style="font-size:10px;font-weight:400;color:#64748b;text-transform:none;letter-spacing:0">(нажмите ячейку → список заданий)</span></span>
+      <span>Тепловая карта — получасы × период <span style="font-size:10px;font-weight:400;color:#64748b;text-transform:none;letter-spacing:0">(нажмите ячейку → список заданий)</span></span>
       <div style="display:flex;gap:8px">
         <button class="pill on" id="hg-day"   onclick="setHeatGroup('day')"   style="padding:3px 10px">По дням</button>
         <button class="pill"    id="hg-week"  onclick="setHeatGroup('week')"  style="padding:3px 10px">По неделям</button>
@@ -254,11 +275,66 @@ canvas#lineChart{display:block}
   </div>
 </div>
 
+<!-- MEMO -->
+<div class="memo-overlay" id="memo-overlay">
+  <div class="memo-modal">
+    <div class="memo-hdr">
+      <h2>📋 Памятка</h2>
+      <button class="memo-close" onclick="document.getElementById('memo-overlay').classList.remove('on')">✕</button>
+    </div>
+    <div class="memo-body">
+
+      <!-- ====== ТЕКСТ ПАМЯТКИ — РЕДАКТИРУЙТЕ ЗДЕСЬ ====== -->
+      <p><b>По какому принципу задания попадают в тот или иной интервал</b></p>
+
+      <div class="memo-rule">
+        <b>🕐 Интервал = время из таблицы, а не расчёт</b>
+        Дашборд сам интервал <u>не назначает</u>. Он берёт готовое время из колонки <span class="col">«Время» (столбец H)</span> каждой строки и раскладывает задания по <b>получасовым</b> интервалам: 08:00, 08:30, 09:00, 09:30 и т.д.
+        <ul>
+          <li>Минуты <b>00–29</b> → первая половина часа (напр. 14:20 → <b>14:00</b>)</li>
+          <li>Минуты <b>30–59</b> → вторая половина часа (напр. 14:50 → <b>14:30</b>)</li>
+        </ul>
+        <p>Поэтому «почему одно задание в 14:00, а другое в 14:30» = <b>такое время записано в исходной таблице</b>.</p>
+      </div>
+
+      <div class="memo-rule">
+        <b>❓ Что означает это время</b>
+        <!-- ВПИШИТЕ СВОЁ: что именно проставляется в колонку H -->
+        Время в колонке H — это <b>момент создания / регистрации задания</b> (когда документ появился в системе). Даты сборки и отгрузки на интервал не влияют.
+        <p style="color:#64748b;font-size:12px">⚠️ Уточните формулировку под свой процесс — это единственное, что задаётся не в коде, а при заполнении таблицы.</p>
+      </div>
+
+      <div class="memo-rule">
+        <b>📅 Интервал и дата — разные вещи</b>
+        <ul>
+          <li><span class="col">Получас</span> берётся из колонки «Время» (H).</li>
+          <li><span class="col">День</span>, к которому относится задание, — из «Даты сборки» (G).</li>
+          <li>«Дата отгрузки» (D) показывается для справки и на интервал не влияет.</li>
+        </ul>
+      </div>
+
+      <div class="memo-rule">
+        <b>🔎 Фильтры только отбирают строки</b>
+        Период (Всё время / месяц / 7 дней / диапазон) и тип доставки сначала <b>отсеивают</b> ненужные строки, и лишь потом оставшиеся раскладываются по получасам. Сам интервал при этом не меняется.
+      </div>
+
+      <div class="memo-rule">
+        <b>🚫 Когда строка не попадает никуда</b>
+        Задание игнорируется, если пустой № задания, нет даты или время пустое/некорректное (не распознаётся как ЧЧ:ММ).
+      </div>
+      <!-- ====== КОНЕЦ ТЕКСТА ПАМЯТКИ ====== -->
+
+    </div>
+  </div>
+</div>
+
 <script>
 var SHEET_ID = '1UC9fKZo9B87MTCyRaOaO8_ydEdWmFGc1NwcOn2790vg';
 var GID      = '1440282364';
 var CACHE_KEY= 'wh_hours_v2';
 var CACHE_TTL= 60*60*1000;
+
+var SLOTS = 48;          // 24 часа × 2 получаса
 
 var allRows      = [];
 var activePeriod = 'all';
@@ -274,6 +350,13 @@ var heatGroup    = 'day';
 var MONTHS      =['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 var MONTHS_SHORT=['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
 var DOW         =['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+
+/* slot helpers: slot 0..47 */
+function slotLabel(slot){
+  var h=Math.floor(slot/2), m=(slot%2)*30;
+  return ('0'+h).slice(-2)+':'+('0'+m).slice(-2);
+}
+function slotIsHalf(slot){ return slot%2===1; }
 
 /* ============ DATA ============ */
 function loadData(){
@@ -340,12 +423,16 @@ function parseDate(s){
   var d=new Date(s); return isNaN(d)?null:d;
 }
 
-function parseHour(s){
+/* Время → получасовой слот 0..47 (минуты 00-29 → :00, 30-59 → :30) */
+function parseSlot(s){
   if(!s) return null;
   var m=s.match(/(\d{1,2}):(\d{2})/);
   if(!m) return null;
   var h=parseInt(m[1],10);
-  return (h>=0&&h<=23)?h:null;
+  var min=parseInt(m[2],10);
+  if(h<0||h>23) return null;
+  if(isNaN(min)) min=0;
+  return h*2 + (min>=30?1:0);
 }
 
 function dkey(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
@@ -368,9 +455,9 @@ function processCSV(txt){
     var shipDateRaw=(c[3]||'').trim();  // колонка Дата отгрузки (D, индекс 3)
     if(!num||!dateRaw||!timeRaw) continue;
     var d=parseDate(dateRaw); if(!d) continue;
-    var hour=parseHour(timeRaw); if(hour===null) continue;
+    var slot=parseSlot(timeRaw); if(slot===null) continue;
     var shipDate=parseDate(shipDateRaw);
-    allRows.push({num:num,date:d,dateKey:dkey(d),monthKey:mkey(d),weekKey:wkey(d),hour:hour,delivery:delivery,author:author,shipDate:shipDate});
+    allRows.push({num:num,date:d,dateKey:dkey(d),monthKey:mkey(d),weekKey:wkey(d),slot:slot,delivery:delivery,author:author,shipDate:shipDate});
   }
   buildDeliveryPills();
   setDateBounds();
@@ -470,12 +557,12 @@ function render(){
   renderBarDrill(rows);
 }
 
-/* ---- HOUR STRIP ---- */
+/* ---- HOUR STRIP (получасы) ---- */
 function renderHourStrip(rows){
-  var hours=new Array(24).fill(0);
-  rows.forEach(function(r){hours[r.hour]++;});
+  var slots=new Array(SLOTS).fill(0);
+  rows.forEach(function(r){slots[r.slot]++;});
   var total=rows.length||1;
-  var maxH=Math.max.apply(null,hours)||1;
+  var maxH=Math.max.apply(null,slots)||1;
   var BAR_MAX=36; // px высота максимального бара
 
   function barColor(t){
@@ -500,60 +587,62 @@ function renderHourStrip(rows){
   document.getElementById('hs-period-label').textContent=pLabel;
 
   var html='';
-  for(var h=0;h<24;h++){
-    var cnt=hours[h];
+  for(var sl=0;sl<SLOTS;sl++){
+    var cnt=slots[sl];
     var pct=Math.round(cnt/total*100);
     var t=cnt/maxH;
     var barH=Math.max(Math.round(t*BAR_MAX),2);
     var col=barColor(t);
-    var hh=('0'+h).slice(-2);
-    // find most common day for this hour (for tooltip)
-    var tooltip='<b style="color:#0284c7">'+hh+':00</b><br>Заданий: <b>'+cnt+'</b><br>Доля: <b>'+pct+'%</b>';
-    html+='<div class="hs-col" onclick="onHourStripClick('+h+')">'
+    var lab=slotLabel(sl);
+    var lblHtml=slotIsHalf(sl)
+      ? '<span style="color:#94a3b8;font-size:7px">30</span>'
+      : ('0'+Math.floor(sl/2)).slice(-2);
+    var tooltip='<b style="color:#0284c7">'+lab+'</b><br>Заданий: <b>'+cnt+'</b><br>Доля: <b>'+pct+'%</b>';
+    html+='<div class="hs-col" onclick="onHourStripClick('+sl+')">'
       +'<div class="hs-tooltip">'+tooltip+'</div>'
       +'<div class="hs-pct">'+(pct>0?pct+'%':'')+'</div>'
       +'<div class="hs-bar" style="height:'+barH+'px;background:'+col+'"></div>'
-      +'<div class="hs-lbl">'+hh+'</div>'
+      +'<div class="hs-lbl">'+lblHtml+'</div>'
       +'</div>';
   }
   document.getElementById('hs-inner').innerHTML=html;
 }
 
-function onHourStripClick(h){
-  // провалиться в день с максимумом для этого часа
+function onHourStripClick(slot){
+  // провалиться в день с максимумом для этого интервала
   var rows=getFiltered();
   var dayCount={};
-  rows.filter(function(r){return r.hour===h;}).forEach(function(r){
+  rows.filter(function(r){return r.slot===slot;}).forEach(function(r){
     dayCount[r.dateKey]=(dayCount[r.dateKey]||0)+1;
   });
   var keys=Object.keys(dayCount);
   if(!keys.length) return;
   var best=keys.reduce(function(a,b){return dayCount[a]>=dayCount[b]?a:b;});
-  showPopup(best,h);
+  showPopup(best,slot);
 }
 
 /* ---- SUMMARY ---- */
 function renderSummary(rows){
-  var days={}, hours=new Array(24).fill(0), dayCount={};
+  var days={}, slots=new Array(SLOTS).fill(0), dayCount={};
   rows.forEach(function(r){
     days[r.dateKey]=true;
-    hours[r.hour]++;
+    slots[r.slot]++;
     dayCount[r.dateKey]=(dayCount[r.dateKey]||0)+1;
   });
   var dayKeys=Object.keys(days);
-  var peakH=hours.indexOf(Math.max.apply(null,hours));
+  var peakSlot=slots.indexOf(Math.max.apply(null,slots));
   var avg=dayKeys.length>0?Math.round(rows.length/dayKeys.length):0;
   var busiestDay=dayKeys.reduce(function(best,k){return (dayCount[k]>(dayCount[best]||0))?k:best;},dayKeys[0]||'');
   var busiestLabel=busiestDay?busiestDay.split('-').reverse().join('.'):'—';
 
   document.getElementById('s-total').textContent=rows.length;
   document.getElementById('s-days').textContent=dayKeys.length;
-  document.getElementById('s-peak-hour').textContent=rows.length?('0'+peakH).slice(-2)+':00':'—';
+  document.getElementById('s-peak-hour').textContent=rows.length?slotLabel(peakSlot):'—';
   document.getElementById('s-avg').textContent=avg;
   document.getElementById('s-busiest').textContent=busiestLabel;
 }
 
-/* ---- AUTHORS HEATMAP: rows=hours(0-23), cols=authors ---- */
+/* ---- AUTHORS HEATMAP: rows=slots(0-47), cols=authors ---- */
 function renderLineChart(rows){
   renderAuthorsHeatmap(rows);
 }
@@ -562,12 +651,12 @@ function renderAuthorsHeatmap(rows){
   var wrap=document.getElementById('authors-heatmap-wrap');
   if(!wrap) return;
 
-  // Build author → hours[24] map
+  // Build author → slots[48] map
   var authorMap={};
   rows.forEach(function(r){
     if(!r.author) return;
-    if(!authorMap[r.author]) authorMap[r.author]=new Array(24).fill(0);
-    authorMap[r.author][r.hour]++;
+    if(!authorMap[r.author]) authorMap[r.author]=new Array(SLOTS).fill(0);
+    authorMap[r.author][r.slot]++;
   });
 
   var authors=Object.keys(authorMap).sort(function(a,b){
@@ -596,9 +685,9 @@ function renderAuthorsHeatmap(rows){
     return '#dc2626';
   }
 
-  // Table: rows=hours, cols=authors
+  // Table: rows=slots, cols=authors
   var html='<table class="hm-table"><thead><tr>';
-  html+='<th class="hm-th-hour">Час</th>';
+  html+='<th class="hm-th-hour">Время</th>';
   authors.forEach(function(a){
     var parts=a.split(' ');
     var ln=parts[0]||a;
@@ -610,13 +699,13 @@ function renderAuthorsHeatmap(rows){
   });
   html+='</tr></thead><tbody>';
 
-  for(var h=0;h<24;h++){
-    html+='<tr><td class="hm-th-hour">'+('0'+h).slice(-2)+':00</td>';
+  for(var sl=0;sl<SLOTS;sl++){
+    var rowCls=slotIsHalf(sl)?' class="hm-row-half"':'';
+    html+='<tr'+rowCls+'><td class="hm-th-hour">'+slotLabel(sl)+'</td>';
     authors.forEach(function(a){
-      var v=authorMap[a][h];
-      var total=authorMap[a].reduce(function(s,x){return s+x;},0);
-      var title=a+' '+('0'+h).slice(-2)+':00 — '+v+' зад.';
-      html+='<td style="padding:0"><div class="hm-cell" style="background:'+cellColor(v)+';width:52px" title="'+title+'" onclick="showAuthorHourPopup(\''+a.replace(/'/g,"\\'")+"',"+h+')">';
+      var v=authorMap[a][sl];
+      var title=a+' '+slotLabel(sl)+' — '+v+' зад.';
+      html+='<td style="padding:0"><div class="hm-cell" style="background:'+cellColor(v)+';width:52px" title="'+title+'" onclick="showAuthorHourPopup(\''+a.replace(/'/g,"\\'")+"',"+sl+')">';
       if(v>0) html+='<div class="hm-cell-val">'+v+'</div>';
       html+='</div></td>';
     });
@@ -624,11 +713,10 @@ function renderAuthorsHeatmap(rows){
   }
   html+='</tbody></table>';
 
-  // Legend + totals row
+  // totals row
   var totalsRow='<div style="margin-top:10px;display:flex;gap:3px;flex-wrap:wrap">';
   authors.forEach(function(a){
     var total=authorMap[a].reduce(function(s,v){return s+v;},0);
-    var parts=a.split(' ');
     totalsRow+='<div style="background:#e2e8f0;border:1px solid #d7dee8;border-radius:4px;padding:3px 6px;font-size:9px;text-align:center;min-width:52px">'+
       '<div style="color:#0284c7;font-weight:700">'+total+'</div>'+
       '<div style="color:#64748b">всего</div></div>';
@@ -645,10 +733,10 @@ function renderAuthorsHeatmap(rows){
   wrap.innerHTML=html+totalsRow+legend;
 }
 
-function showAuthorHourPopup(author, hour){
-  var rows=getFiltered().filter(function(r){ return r.author===author && r.hour===hour; });
+function showAuthorHourPopup(author, slot){
+  var rows=getFiltered().filter(function(r){ return r.author===author && r.slot===slot; });
   if(!rows.length) return;
-  document.getElementById('popup-title').textContent='👤 '+author+' — '+('0'+hour).slice(-2)+':00 — '+rows.length+' зад.';
+  document.getElementById('popup-title').textContent='👤 '+author+' — '+slotLabel(slot)+' — '+rows.length+' зад.';
   var html='<div style="overflow-x:auto"><table class="tasks-table"><thead><tr>'+
     '<th>№ задания</th><th>Дата сборки</th><th>Дата отгрузки</th><th>Время</th><th>Тип доставки</th>'+
     '</tr></thead><tbody>';
@@ -657,7 +745,7 @@ function showAuthorHourPopup(author, hour){
     var sd=r.shipDate?('0'+r.shipDate.getDate()).slice(-2)+'.'+('0'+(r.shipDate.getMonth()+1)).slice(-2)+'.'+r.shipDate.getFullYear():'—';
     html+='<tr><td class="num-cell">'+r.num+'</td><td class="date-cell">'+dd+'</td>'+
       '<td class="date-cell" style="color:#16a34a">'+sd+'</td>'+
-      '<td class="date-cell">'+('0'+r.hour).slice(-2)+':xx</td>'+
+      '<td class="date-cell">'+slotLabel(r.slot)+'</td>'+
       '<td class="del-cell">'+r.delivery+'</td></tr>';
   });
   html+='</tbody></table></div>';
@@ -665,7 +753,7 @@ function showAuthorHourPopup(author, hour){
   document.getElementById('popup').classList.add('on');
 }
 
-/* ---- HEATMAP (transposed: rows=hours, cols=period groups) ---- */
+/* ---- HEATMAP (transposed: rows=slots, cols=period groups) ---- */
 function setHeatGroup(g){
   heatGroup=g;
   ['day','week','month'].forEach(function(v){ document.getElementById('hg-'+v).className='pill'+(v===g?' on':''); });
@@ -673,12 +761,12 @@ function setHeatGroup(g){
 }
 
 function renderHeatmap(rows){
-  // Group rows by heatGroup key → aggregate hours
+  // Group rows by heatGroup key → aggregate slots
   var groups={};
   rows.forEach(function(r){
     var key = heatGroup==='month' ? r.monthKey : heatGroup==='week' ? r.weekKey : r.dateKey;
-    if(!groups[key]) groups[key]={key:key, date:r.date, hours:new Array(24).fill(0), dateKeys:{}};
-    groups[key].hours[r.hour]++;
+    if(!groups[key]) groups[key]={key:key, date:r.date, slots:new Array(SLOTS).fill(0), dateKeys:{}};
+    groups[key].slots[r.slot]++;
     groups[key].dateKeys[r.dateKey]=true;
   });
 
@@ -687,7 +775,7 @@ function renderHeatmap(rows){
 
   var showKeys=groupKeys.length>60?groupKeys.slice(-60):groupKeys;
   var maxVal=0;
-  showKeys.forEach(function(k){ groups[k].hours.forEach(function(v){if(v>maxVal)maxVal=v;}); });
+  showKeys.forEach(function(k){ groups[k].slots.forEach(function(v){if(v>maxVal)maxVal=v;}); });
 
   function cellColor(v){
     if(v===0) return '#e2e8f0';
@@ -703,44 +791,41 @@ function renderHeatmap(rows){
     var p=k.split('-');
     if(heatGroup==='month') return MONTHS_SHORT[parseInt(p[1],10)-1]+'<br><span style="color:#64748b">'+p[0]+'</span>';
     if(heatGroup==='week'){
-      // week key = monday date
       return p[2]+'.'+p[1]+'<br><span style="color:#64748b">нед</span>';
     }
-    // day
     var d=groups[k].date;
     return ('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'<br><span style="color:#64748b">'+DOW[d.getDay()]+'</span>';
   }
 
-  function cellTitle(k, h){
+  function cellTitle(k, sl){
     var p=k.split('-');
     var periodStr='';
     if(heatGroup==='month') periodStr=MONTHS[parseInt(p[1],10)-1]+' '+p[0];
     else if(heatGroup==='week') periodStr='Неделя с '+p[2]+'.'+p[1]+'.'+p[0];
     else{ var d=groups[k].date; periodStr=('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+' '+DOW[d.getDay()]; }
-    return periodStr+' '+('0'+h).slice(-2)+':00 — '+groups[k].hours[h]+' зад.';
+    return periodStr+' '+slotLabel(sl)+' — '+groups[k].slots[sl]+' зад.';
   }
 
-  // For click — need a representative dateKey. For day=direct, for week/month pick first dateKey
-  function clickArg(k, h){
-    if(heatGroup==='day') return "'"+k+"',"+h;
-    // for week/month we show popup with all rows in that period+hour
+  function clickArg(k, sl){
+    if(heatGroup==='day') return "'"+k+"',"+sl;
     var dkeys=Object.keys(groups[k].dateKeys);
-    return "'"+dkeys[0]+"',"+h+",'"+k+"','"+heatGroup+"'";
+    return "'"+dkeys[0]+"',"+sl+",'"+k+"','"+heatGroup+"'";
   }
 
-  // Build table: rows=hours (0-23), cols=groups
+  // Build table: rows=slots (0-47), cols=groups
   var html='<table class="hm-table"><thead><tr>';
-  html+='<th class="hm-th-hour">Час</th>';
+  html+='<th class="hm-th-hour">Время</th>';
   showKeys.forEach(function(k){
     html+='<th class="hm-th-date">'+colLabel(k)+'</th>';
   });
   html+='</tr></thead><tbody>';
 
-  for(var h=0;h<24;h++){
-    html+='<tr><td class="hm-th-hour">'+('0'+h).slice(-2)+':00</td>';
+  for(var sl=0;sl<SLOTS;sl++){
+    var rowCls=slotIsHalf(sl)?' class="hm-row-half"':'';
+    html+='<tr'+rowCls+'><td class="hm-th-hour">'+slotLabel(sl)+'</td>';
     showKeys.forEach(function(k){
-      var v=groups[k].hours[h];
-      html+='<td style="padding:0"><div class="hm-cell" style="background:'+cellColor(v)+'" title="'+cellTitle(k,h)+'" onclick="showPopupGroup('+clickArg(k,h)+')">';
+      var v=groups[k].slots[sl];
+      html+='<td style="padding:0"><div class="hm-cell" style="background:'+cellColor(v)+'" title="'+cellTitle(k,sl)+'" onclick="showPopupGroup('+clickArg(k,sl)+')">';
       if(v>0) html+='<div class="hm-cell-val">'+v+'</div>';
       html+='</div></td>';
     });
@@ -771,8 +856,8 @@ function renderBarMonths(rows){
   document.getElementById('bar-title').textContent='Детализация по месяцам — нажмите для провала';
   var mmap={};
   rows.forEach(function(r){
-    if(!mmap[r.monthKey]) mmap[r.monthKey]={key:r.monthKey,date:r.date,count:0,hours:new Array(24).fill(0)};
-    mmap[r.monthKey].count++; mmap[r.monthKey].hours[r.hour]++;
+    if(!mmap[r.monthKey]) mmap[r.monthKey]={key:r.monthKey,date:r.date,count:0,slots:new Array(SLOTS).fill(0)};
+    mmap[r.monthKey].count++; mmap[r.monthKey].slots[r.slot]++;
   });
   var months=Object.values(mmap).sort(function(a,b){return a.key>b.key?1:-1;});
   if(!months.length){document.getElementById('bar-content').innerHTML='<div class="empty">Нет данных</div>';return;}
@@ -780,7 +865,7 @@ function renderBarMonths(rows){
 
   var html='<div class="m-grid">';
   months.forEach(function(m){
-    var peak=m.hours.indexOf(Math.max.apply(null,m.hours));
+    var peak=m.slots.indexOf(Math.max.apply(null,m.slots));
     var p=m.key.split('-');
     var bar=Math.round(m.count/maxC*100);
     html+='<div class="m-card" onclick="drillToMonth(\''+m.key+'\')">'+
@@ -788,7 +873,7 @@ function renderBarMonths(rows){
       '<div class="m-card-sub">'+p[0]+'</div>'+
       '<div class="m-card-stat">📦 '+m.count+' заданий</div>'+
       '<div style="margin-top:6px;height:4px;background:#d7dee8;border-radius:2px"><div style="height:100%;width:'+bar+'%;background:#0284c7;border-radius:2px"></div></div>'+
-      '<div class="m-card-peak">Пик: '+('0'+peak).slice(-2)+':00</div>'+
+      '<div class="m-card-peak">Пик: '+slotLabel(peak)+'</div>'+
       '</div>';
   });
   html+='</div>';
@@ -796,24 +881,24 @@ function renderBarMonths(rows){
 }
 
 function renderBarDays(rows){
-  document.getElementById('bar-title').textContent='Дни месяца — нажмите для часового профиля';
+  document.getElementById('bar-title').textContent='Дни месяца — нажмите для получасового профиля';
   var filtered=rows.filter(function(r){return r.monthKey===drillMonth;});
   var dmap={};
   filtered.forEach(function(r){
-    if(!dmap[r.dateKey]) dmap[r.dateKey]={key:r.dateKey,date:r.date,count:0,hours:new Array(24).fill(0)};
-    dmap[r.dateKey].count++; dmap[r.dateKey].hours[r.hour]++;
+    if(!dmap[r.dateKey]) dmap[r.dateKey]={key:r.dateKey,date:r.date,count:0,slots:new Array(SLOTS).fill(0)};
+    dmap[r.dateKey].count++; dmap[r.dateKey].slots[r.slot]++;
   });
   var days2=Object.values(dmap).sort(function(a,b){return a.key>b.key?1:-1;});
   if(!days2.length){document.getElementById('bar-content').innerHTML='<div class="empty">Нет данных</div>';return;}
 
   var html='<div class="d-grid">';
   days2.forEach(function(d){
-    var peak=d.hours.indexOf(Math.max.apply(null,d.hours));
+    var peak=d.slots.indexOf(Math.max.apply(null,d.slots));
     html+='<div class="d-card" onclick="drillToDay(\''+d.key+'\')">'+
       '<div class="d-card-date">'+('0'+d.date.getDate()).slice(-2)+'</div>'+
       '<div class="d-card-dow">'+DOW[d.date.getDay()]+'</div>'+
       '<div class="d-card-tasks">📦 '+d.count+'</div>'+
-      '<div class="d-card-peak">Пик: '+('0'+peak).slice(-2)+':00</div>'+
+      '<div class="d-card-peak">Пик: '+slotLabel(peak)+'</div>'+
       '</div>';
   });
   html+='</div>';
@@ -822,11 +907,11 @@ function renderBarDays(rows){
 
 function renderBarHours(rows){
   var dp=drillDay.split('-');
-  document.getElementById('bar-title').textContent='Часовой профиль — '+dp[2]+'.'+dp[1]+'.'+dp[0];
+  document.getElementById('bar-title').textContent='Получасовой профиль — '+dp[2]+'.'+dp[1]+'.'+dp[0];
   var filtered=rows.filter(function(r){return r.dateKey===drillDay;});
-  var hours=new Array(24).fill(0);
-  filtered.forEach(function(r){hours[r.hour]++;});
-  var maxH=Math.max.apply(null,hours)||1;
+  var slots=new Array(SLOTS).fill(0);
+  filtered.forEach(function(r){slots[r.slot]++;});
+  var maxH=Math.max.apply(null,slots)||1;
 
   function barColor(v,mx){
     var t=v/mx;
@@ -837,10 +922,11 @@ function renderBarHours(rows){
   }
 
   var html='<div class="bar-wrap">';
-  for(var h=0;h<24;h++){
-    var cnt=hours[h], pct=maxH>0?(cnt/maxH*100):0, col=barColor(cnt,maxH);
-    html+='<div class="bar-row" onclick="showPopup(\''+drillDay+'\','+h+')">'+
-      '<div class="bar-label">'+('0'+h).slice(-2)+':00</div>'+
+  for(var sl=0;sl<SLOTS;sl++){
+    var cnt=slots[sl], pct=maxH>0?(cnt/maxH*100):0, col=barColor(cnt,maxH);
+    var rowCls=slotIsHalf(sl)?' half':'';
+    html+='<div class="bar-row'+rowCls+'" onclick="showPopup(\''+drillDay+'\','+sl+')">'+
+      '<div class="bar-label">'+slotLabel(sl)+'</div>'+
       '<div class="bar-bg"><div class="bar-fill" style="width:'+Math.max(pct,0)+'%;background:'+col+'">'+(cnt>0&&pct>12?cnt+' зад.':'')+'</div></div>'+
       '<div class="bar-val" style="color:'+(cnt>0?col:'#64748b')+'">'+(cnt||'')+'</div>'+
       '</div>';
@@ -871,11 +957,11 @@ function drillToMonth(mk){ drillLevel='month'; drillMonth=mk; drillDay=null; ren
 function drillToDay(dk){ drillLevel='day'; drillMonth=dk.slice(0,7); drillDay=dk; renderBarDrill(getFiltered()); }
 
 /* ---- POPUP ---- */
-function showPopup(dateKey,hour){
-  var rows=getFiltered().filter(function(r){return r.dateKey===dateKey&&r.hour===hour;});
+function showPopup(dateKey,slot){
+  var rows=getFiltered().filter(function(r){return r.dateKey===dateKey&&r.slot===slot;});
   if(!rows.length) return;
   var dp=dateKey.split('-');
-  document.getElementById('popup-title').textContent='🕐 '+dp[2]+'.'+dp[1]+'.'+dp[0]+' '+('0'+hour).slice(-2)+':00 — '+rows.length+' зад.';
+  document.getElementById('popup-title').textContent='🕐 '+dp[2]+'.'+dp[1]+'.'+dp[0]+' '+slotLabel(slot)+' — '+rows.length+' зад.';
   var html='<div style="overflow-x:auto"><table class="tasks-table"><thead><tr>'+
     '<th>№ задания</th><th>Дата сборки</th><th>Дата отгрузки</th><th>Время</th><th>Тип доставки</th><th>Автор</th>'+
     '</tr></thead><tbody>';
@@ -884,7 +970,7 @@ function showPopup(dateKey,hour){
     var sd=r.shipDate?('0'+r.shipDate.getDate()).slice(-2)+'.'+('0'+(r.shipDate.getMonth()+1)).slice(-2)+'.'+r.shipDate.getFullYear():'—';
     html+='<tr><td class="num-cell">'+r.num+'</td><td class="date-cell">'+dd+'</td>'+
       '<td class="date-cell" style="color:#16a34a">'+sd+'</td>'+
-      '<td class="date-cell">'+('0'+r.hour).slice(-2)+':xx</td>'+
+      '<td class="date-cell">'+slotLabel(r.slot)+'</td>'+
       '<td class="del-cell">'+r.delivery+'</td>'+
       '<td style="font-size:11px;color:#0284c7">'+r.author+'</td></tr>';
   });
@@ -894,13 +980,11 @@ function showPopup(dateKey,hour){
 }
 function closePopup(){ document.getElementById('popup').classList.remove('on'); }
 
-function showPopupGroup(dateKey, hour, groupKey, groupType){
-  // If no groupKey, fall back to regular showPopup
-  if(!groupKey){ showPopup(dateKey, hour); return; }
-  // Aggregate all rows matching this period group + hour
+function showPopupGroup(dateKey, slot, groupKey, groupType){
+  if(!groupKey){ showPopup(dateKey, slot); return; }
   var filtered=getFiltered();
   var rows=filtered.filter(function(r){
-    if(r.hour!==hour) return false;
+    if(r.slot!==slot) return false;
     if(groupType==='week') return r.weekKey===groupKey;
     if(groupType==='month') return r.monthKey===groupKey;
     return r.dateKey===groupKey;
@@ -910,7 +994,7 @@ function showPopupGroup(dateKey, hour, groupKey, groupType){
   var periodStr=groupType==='month'
     ? MONTHS[parseInt(p[1],10)-1]+' '+p[0]
     : 'Неделя с '+p[2]+'.'+p[1]+'.'+p[0];
-  document.getElementById('popup-title').textContent='🕐 '+periodStr+' '+('0'+hour).slice(-2)+':00 — '+rows.length+' зад.';
+  document.getElementById('popup-title').textContent='🕐 '+periodStr+' '+slotLabel(slot)+' — '+rows.length+' зад.';
   var html='<div style="overflow-x:auto"><table class="tasks-table"><thead><tr>'+
     '<th>№ задания</th><th>Дата сборки</th><th>Дата отгрузки</th><th>Время</th><th>Тип доставки</th><th>Автор</th>'+
     '</tr></thead><tbody>';
@@ -919,7 +1003,7 @@ function showPopupGroup(dateKey, hour, groupKey, groupType){
     var sd=r.shipDate?('0'+r.shipDate.getDate()).slice(-2)+'.'+('0'+(r.shipDate.getMonth()+1)).slice(-2)+'.'+r.shipDate.getFullYear():'—';
     html+='<tr><td class="num-cell">'+r.num+'</td><td class="date-cell">'+dd+'</td>'+
       '<td class="date-cell" style="color:#16a34a">'+sd+'</td>'+
-      '<td class="date-cell">'+('0'+r.hour).slice(-2)+':xx</td>'+
+      '<td class="date-cell">'+slotLabel(r.slot)+'</td>'+
       '<td class="del-cell">'+r.delivery+'</td>'+
       '<td style="font-size:11px;color:#0284c7">'+r.author+'</td></tr>';
   });
@@ -927,6 +1011,11 @@ function showPopupGroup(dateKey, hour, groupKey, groupType){
   document.getElementById('popup-body').innerHTML=html;
   document.getElementById('popup').classList.add('on');
 }
+
+/* ---- MEMO close on backdrop ---- */
+document.getElementById('memo-overlay').addEventListener('click',function(e){
+  if(e.target===this) this.classList.remove('on');
+});
 
 /* ============ INIT ============ */
 window.addEventListener('resize', function(){
@@ -943,108 +1032,5 @@ setInterval(function(){
   }).catch(function(){});
 }, 60*60*1000);
 </script>
-   <!-- ===================== КНОПКА «ПАМЯТКА» + ОКНО ===================== -->
-<!-- Вставьте этот блок ОДИН РАЗ перед закрывающим тегом </body> -->
-<style>
-  .memo-btn{
-    padding:7px 14px;background:#6d28d9;color:#fff;border:none;border-radius:20px;
-    font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;
-    gap:6px;white-space:nowrap;box-shadow:0 1px 2px rgba(15,23,42,.12);
-  }
-  .memo-btn:hover{background:#5b21b6}
-  .memo-overlay{
-    display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);
-    z-index:399;align-items:flex-end;justify-content:center;
-  }
-  .memo-overlay.on{display:flex}
-  .memo-modal{
-    background:#fff;border-radius:12px 12px 0 0;padding:22px;width:100%;max-width:760px;
-    max-height:86vh;overflow-y:auto;box-shadow:0 -8px 30px rgba(15,23,42,.18);
-  }
-  .memo-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-  .memo-hdr h2{font-size:18px;color:#0284c7}
-  .memo-close{background:none;border:none;color:#64748b;font-size:24px;cursor:pointer;line-height:1}
-  .memo-body{font-size:13px;color:#1f2937;line-height:1.6}
-  .memo-body p{margin:6px 0}
-  .memo-rule{
-    background:#f1f5f9;border:1px solid #e5e7eb;border-left:3px solid #6d28d9;
-    border-radius:6px;padding:11px 13px;margin:11px 0;
-  }
-  .memo-rule b{color:#111827;display:block;margin-bottom:4px;font-size:13px}
-  .memo-rule ul{margin:4px 0 0 18px}
-  .memo-rule li{margin:2px 0}
-  .memo-rule .col{color:#0284c7;font-weight:700}
-</style>
-
-<div class="memo-overlay" id="memo-overlay">
-  <div class="memo-modal">
-    <div class="memo-hdr">
-      <h2>📋 Памятка</h2>
-      <button class="memo-close" id="memo-close">✕</button>
-    </div>
-    <div class="memo-body">
-
-      <!-- ====== ТЕКСТ ПАМЯТКИ — РЕДАКТИРУЙТЕ ЗДЕСЬ ====== -->
-      <p><b>Как распределяются документы по часам</b></p>
-      <p>Данные берутся из Google-таблицы заданий. Каждая строка таблицы — это одно задание (документ).</p>
-
-      <div class="memo-rule">
-        <b>🕐 По какому часу попадает документ</b>
-        Час берётся из колонки <span class="col">«Время» (столбец H)</span>. Документ попадает в тот час (00:00–23:00), который указан в этом поле — минуты не учитываются, важен только час.
-        <p>Строка пропускается, если нет <b>№ задания</b>, нет <b>даты</b>, либо время пустое/некорректное.</p>
-      </div>
-
-      <div class="memo-rule">
-        <b>📑 Какие колонки читаются</b>
-        <ul>
-          <li><span class="col">A</span> — № задания</li>
-          <li><span class="col">D</span> — Дата отгрузки</li>
-          <li><span class="col">G</span> — Дата сборки</li>
-          <li><span class="col">H</span> — Время → <b>определяет час</b></li>
-          <li><span class="col">I</span> — Тип доставки</li>
-          <li><span class="col">J</span> — Автор</li>
-        </ul>
-      </div>
-
-      <div class="memo-rule">
-        <b>🔎 Фильтры применяются ДО распределения</b>
-        Сначала отбираются строки по периоду (Всё время / Этот месяц / 7 дней / 1 день / диапазон) и типу доставки, и только потом они раскладываются по часам.
-      </div>
-
-      <div class="memo-rule">
-        <b>📊 Что показывают блоки</b>
-        <ul>
-          <li><b>Полоса вверху</b> — доля заданий (%) в каждый час от общего числа.</li>
-          <li><b>Часы × Автор</b> — сколько заданий каждый автор сделал в каждый час.</li>
-          <li><b>Часы × Период</b> — интенсивность по дням / неделям / месяцам.</li>
-          <li><b>Час-пик</b> — час с наибольшим числом заданий за выбранный период.</li>
-        </ul>
-        Цвет — это интенсивность: от зелёного (мало) к жёлтому и красному (пик).
-      </div>
-      <!-- ====== КОНЕЦ ТЕКСТА ПАМЯТКИ ====== -->
-
-    </div>
-  </div>
-</div>
-
-<script>
-(function(){
-  var header=document.querySelector('header');
-  if(header){
-    var btn=document.createElement('button');
-    btn.className='memo-btn';
-    btn.innerHTML='📋 Памятка';
-    btn.addEventListener('click',function(){ document.getElementById('memo-overlay').classList.add('on'); });
-    var logo=header.querySelector('.logo');
-    var firstBlock=logo?logo.closest('div'):header.firstElementChild;
-    if(firstBlock&&firstBlock.parentNode===header){ header.insertBefore(btn,firstBlock.nextSibling); }
-    else{ header.appendChild(btn); }
-  }
-  var ov=document.getElementById('memo-overlay');
-  document.getElementById('memo-close').addEventListener('click',function(){ ov.classList.remove('on'); });
-  ov.addEventListener('click',function(e){ if(e.target===ov) ov.classList.remove('on'); });
-})();
-</script>
-<!-- =================== КОНЕЦ БЛОКА «ПАМЯТКА» =================== -->
 </body>
 </html>
